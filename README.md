@@ -1,0 +1,9 @@
+﻿# This directory is a Monorepo* for project QuizMaster, containing both quizmaster-app and quizmaster-frontend.
+The file quizmaster-app is a Spring Boot project, essentially a backend part of the project.
+While quizmaster-frontend, as the name suggest is a React frontend part.
+
+
+
+
+
+ *A type of project structure where a parent directory, contains both sub-directories for backend and frontend.

@@ -1,0 +1,308 @@
+.auto-generate-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.auto-generate-card {
+    background: white;
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    margin-right: 16px;
+}
+
+.input-paragraph {
+    margin-bottom: 32px;
+}
+
+.input-paragraph label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.input-paragraph textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.auto-controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 48px;
+    margin-bottom: 32px;
+}
+
+.control-left {
+    padding-right: 48px;
+}
+
+.control-row {
+    margin-bottom: 24px;
+}
+
+.control-row label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+/* Slider styling */
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.slider-row input[type="range"] {
+    flex: 1;
+    height: 4px;
+    background: #6750a4;
+    border-radius: 2px;
+    appearance: none;
+    outline: none;
+}
+
+.slider-row input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #6750a4;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider-value {
+    min-width: 48px;
+    color: #6750a4;
+    font-weight: 500;
+}
+
+/* Question Type dropdown */
+/* Style dropdown like purple checkbox */
+.control-row select {
+    background: #6750a4; /* purple */
+    color: white;
+    border: 2px solid #6750a4;
+    border-radius: 4px;
+    padding: 8px 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Optional: custom arrow like dropdown */
+.control-row select::-ms-expand {
+    display: none; /* for IE */
+}
+
+.control-row select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #b3a5ff;
+}
+
+
+/* Time Limit controls */
+.time-control {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.time-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.time-input input {
+    width: 60px;
+    text-align: center;
+    padding: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+}
+
+.time-input button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #6750a4;
+    color: #6750a4;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.time-input button:hover {
+    background: #f5f0ff;
+}
+
+
+
+/* Generate Questions button */
+.generate-placeholder {
+    background: #6750a4;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    min-width: 180px;
+}
+
+.generate-placeholder:hover {
+    background: #7b61b8;
+}
+
+/* Generated Questions View */
+.generated-questions-container {
+    margin-bottom: 24px;
+}
+
+.generated-questions-container h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1a1a1a;
+}
+
+.question-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 16px;
+}
+
+.question-card h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: #1a1a1a;
+}
+
+.choices-list {
+    margin-bottom: 16px;
+}
+
+.choice-item {
+    padding: 8px 12px;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.question-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.accept-btn,
+.reject-btn {
+    padding: 8px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.accept-btn {
+    background: #e8e8e8;
+    color: #333;
+}
+
+.accept-btn:hover:not(:disabled) {
+    background: #d0d0d0;
+}
+
+.accept-btn.accepted {
+    background: #6750a4;
+    color: white;
+    cursor: default;
+}
+
+.accept-btn:disabled {
+    cursor: not-allowed;
+}
+
+.reject-btn {
+    background: #e8e8e8;
+    color: #333;
+}
+
+.reject-btn:hover {
+    background: #d0d0d0;
+}
+
+.final-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.add-to-quiz-btn,
+.cancel-btn {
+    padding: 12px 32px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.add-to-quiz-btn {
+    background: #c4b5fd;
+    color: #1a1a1a;
+    min-width: 150px;
+}
+
+.add-to-quiz-btn:hover {
+    background: #b3a0f7;
+}
+
+.cancel-btn {
+    background: transparent;
+    color: #333;
+    border: 1px solid #e0e0e0;
+}
+
+.cancel-btn:hover {
+    background: #f5f5f5;
+}

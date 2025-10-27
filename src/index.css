@@ -1,0 +1,18 @@
+/* Tailwind layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your global font + simple light theme */
+:root {
+  --font-ui: 'Times New Roman', Times, serif;
+}
+
+html {
+  font-family: var(--font-ui);
+}
+
+body {
+  /* Tailwind utilities via @apply */
+  @apply bg-white text-black;
+}

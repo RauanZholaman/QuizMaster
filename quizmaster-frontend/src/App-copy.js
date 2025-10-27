@@ -1,8 +1,7 @@
 import './App.css';
 import { useState } from 'react';
-import myImage from './img/BigBoss.jpg';
 import Header from './Header.js';
-import QuestionBank from './QuestionBank.js';
+import QuestionBank from './pages/QuestionBank.js';
 
 import './firebaseConfig.js';
 import { getFirestore, addDoc, collection, getDocs, querySnapshot } from "firebase/firestore"; 

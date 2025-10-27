@@ -12,7 +12,7 @@ export default function Navbar() {
   };
 //style={{display:"flex", gap:12, padding:12, borderBottom:"1px solid #eee"
   return (
-    <nav className="MyHeader">
+    <nav className="MyNavbar">
       <div style={{ padding: 20, display: 'flex', alignItems: 'center', gap: 15}}>
         <Link to="/">Home</Link>
         <Link to="/login">Login</Link>

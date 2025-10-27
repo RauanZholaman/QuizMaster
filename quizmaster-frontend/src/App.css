@@ -73,7 +73,7 @@
   text-align: justify;
 }
 
-.MyHeader{
+.MyNavbar{
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -17,10 +17,10 @@ export default function Navbar() {
         <Link to="/">Home</Link>
         <Link to="/login">Login</Link>
         <Link to="/signup">Signup</Link>
-        <Link to="#">Create Quiz</Link>
+        <Link to="/create-quiz">Create Quiz</Link>
         <Link to="/question-bank">Question Bank</Link>
-        <Link to="#">Take Quiz</Link>
-        <Link to="#">Dashboard</Link>
+        <Link to="/take-quiz">Take Quiz</Link>
+        <Link to="/dashboard">Dashboard</Link>
       </div>
         <span style={{marginLeft: "auto"}}>
         {user ? (

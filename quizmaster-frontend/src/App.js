@@ -8,6 +8,7 @@ import ProtectedRoute from "../src/components/ProtectedRoute";
 import Home from "../src/pages/Home";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
+import ForgotPassword from "../src/pages/ForgotPassword";
 import CreateQuiz from "../src/pages/CreateQuiz";
 import QuestionBank from "../src/pages/QuestionBank";
 import TakeQuiz from "../src/pages/TakeQuiz";
@@ -26,10 +27,9 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/create-quiz"
           element={

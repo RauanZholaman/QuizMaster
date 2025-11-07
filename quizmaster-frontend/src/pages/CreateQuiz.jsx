@@ -550,6 +550,16 @@ export default function CreateQuiz() {
             return;
         }
 
+        const difficultySelected = 
+            quizData.difficulty.easy ||
+            quizData.difficulty.medium ||
+            quizData.difficulty.hard;
+
+        if (!difficultySelected) {
+            alert('Please select one difficulty level');
+            return;
+        }
+
         const payload = {
             title: quizData.title,
             description: quizData.description,

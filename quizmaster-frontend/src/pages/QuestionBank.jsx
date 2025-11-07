@@ -38,6 +38,7 @@ export default function QuestionBank() {
         hard: 0
     });
     const [activeFilter, setActiveFilter] = useState('All Questions');
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -95,7 +96,7 @@ export default function QuestionBank() {
                 setLoading(false);
 
             } catch (err) {
-                console.error("Error fetching questions: ", err);
+                console.error("Error fetching questions: ", err); 
                 setError("Failed to load questions.");
                 setLoading(false);
             }
@@ -150,17 +151,21 @@ export default function QuestionBank() {
         <div className="Question-Bank-Content">
             <SelectionGrid stats={stats} activeFilter={activeFilter} onFilterChange={setActiveFilter}/>
             <div>
-                <FilterBar/>
+                <FilterBar search={search} setSearch={setSearch}/>
                 <div className="Question-Bank-Table">
                     <div className="Question-Bank-Header">
                         <div>Question</div>
-                        <div>Category</div>
+                        <div>Type</div>
                         <div>Difficulty</div>
                         <div>Actions</div>
                     </div>
 
                     <div className="Question-Bank-Body">
-                        {questionsToDisplay.map((q) => (
+                        {questionsToDisplay.filter((q) => {
+                            return search.toLowerCase() === ''
+                                ? q
+                                : q.question.toLowerCase().includes(search);
+                        }).map((q) => (
                         <div key={q.firestoreId} className="Question-Bank-Row">
                             <div>{q.question}</div>
                             <div>{q.type}</div>
@@ -184,7 +189,9 @@ export default function QuestionBank() {
     );
 }
 
-
+//
+// This component displays all grids where each is represent the quantity of specific questions.
+//
 function SelectionGrid({stats, activeFilter, onFilterChange}) {
 
     const handleBoxClick = (filterName) => {
@@ -230,7 +237,10 @@ function SelectionGrid({stats, activeFilter, onFilterChange}) {
     );
 }
 
-function FilterBar() {
+//
+// This component displays filter options above the Question Bank Table
+//
+function FilterBar({search, setSearch}) {
     return (
         <div className="Question-Bank-Filter">
             <div className="filter-left">
@@ -245,7 +255,7 @@ function FilterBar() {
             </div>
 
             <div  className="question-bank-search">
-                <input type="text" placeholder='Search...'></input>
+                <input type="text" onChange={(e) => setSearch(e.target.value)} placeholder='Search...'></input>
             </div>
         </div>
     );

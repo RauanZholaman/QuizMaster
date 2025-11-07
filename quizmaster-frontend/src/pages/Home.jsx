@@ -40,21 +40,21 @@ export default function Home() {
       title: "Take Quiz",
       description: "Start a new quiz assignment",
       icon: <FileText size={32} />,
-      link: "/quizzes",
+      link: "/take-quiz",
       color: "#7c3aed"
     },
     {
       title: "My Results",
       description: "View your quiz scores",
       icon: <Trophy size={32} />,
-      link: "/dashboard",
+      link: "",
       color: "#8b5cf6"
     },
     {
       title: "Progress",
       description: "Track your learning journey",
       icon: <TrendingUp size={32} />,
-      link: "/dashboard",
+      link: "",
       color: "#a78bfa"
     }
   ];

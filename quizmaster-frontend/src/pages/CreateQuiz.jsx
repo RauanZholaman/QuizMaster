@@ -57,7 +57,8 @@ export default function CreateQuiz() {
         timeLimit: 7,
         allowedAttempts: 5,
         shuffle: false,
-        questions: []
+        questions: [],
+        status: ''
     });
     const [newTag, setNewTag] = useState('');
     const [showTagInput, setShowTagInput] = useState(false);
@@ -577,6 +578,8 @@ export default function CreateQuiz() {
                     qb.quizId = quizRef.id;
                     qb.ownerId = user.uid;
                     qb.createdAt = serverTimestamp();
+                    qb.difficulty = quizData.difficulty;
+                    qb.status = quizData.status;
                     promises.push(addDoc(questionBankCol, qb));
                 }
             });
@@ -592,7 +595,8 @@ export default function CreateQuiz() {
                 timeLimit: 7,
                 allowedAttempts: 5,
                 shuffle: false,
-                questions: []
+                questions: [],
+                status: ''
             });
             setCreationType(null);
         } catch (err) {

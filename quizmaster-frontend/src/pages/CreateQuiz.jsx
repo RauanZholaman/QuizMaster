@@ -579,12 +579,13 @@ export default function CreateQuiz() {
                     qb.ownerId = user.uid;
                     qb.createdAt = serverTimestamp();
                     qb.difficulty = quizData.difficulty;
-                    qb.status = quizData.status;
+                    // qb.status = quizData.status;
+                    qb.status = 'published';
                     promises.push(addDoc(questionBankCol, qb));
                 }
             });
             await Promise.all(promises);
-            alert('Quiz published successfully.');
+            alert('Quiz published successfully.');  // SUBJECT TO REMOVAL -- Not sure if this looks nice. Maybe display a simple tab with a nicer look?
             // Optionally clear form
             setQuizData({
                 title: '',

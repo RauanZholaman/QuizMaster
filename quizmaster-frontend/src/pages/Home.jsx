@@ -40,7 +40,7 @@ export default function Home() {
       title: "Take Quiz",
       description: "Start a new quiz assignment",
       icon: <FileText size={32} />,
-      link: "/take-quiz",
+      link: "/quizzes",
       color: "#7c3aed"
     },
     {

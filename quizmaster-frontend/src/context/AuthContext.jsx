@@ -21,7 +21,16 @@ export default function AuthProvider({ children }) {
       try {
         if (u) {
           const snap = await getDoc(doc(db, "users", u.uid));
-          setRole(snap.exists() ? snap.data().role : null);
+          // Prefer role from Firestore; during local dev allow optional override via env or localStorage
+          if (snap.exists()) {
+            setRole(snap.data().role || null);
+          } else {
+            // Dev-friendly default role to unblock navigation when the user doc isn't set up yet
+            const devOverride =
+              (process.env.NODE_ENV !== 'production' && (process.env.REACT_APP_DEFAULT_ROLE || localStorage.getItem('devRole'))) ||
+              null;
+            setRole(devOverride);
+          }
         } else {
           setRole(null);
         }

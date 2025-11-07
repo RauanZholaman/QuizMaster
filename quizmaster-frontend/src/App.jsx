@@ -11,6 +11,8 @@ import AutoGenerate from "./pages/AutoGenerate";
 import QuestionBank from "./pages/QuestionBank";
 import TakeQuiz from "./pages/TakeQuiz";
 import Dashboard from "./pages/Dashboard";
+import GradeQuiz from "./pages/GradeQuiz";
+import QuizFeedback from "./pages/QuizFeedback";
 
 export default function App() {
   return (
@@ -30,6 +32,8 @@ export default function App() {
           <Route path="/question-bank" element={<ProtectedRoute requireRole="educator"><QuestionBank/></ProtectedRoute>} />
           <Route path="/take-quiz" element={<ProtectedRoute requireRole="student"><TakeQuiz/></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute requireRole="educator"><Dashboard/></ProtectedRoute>} />
+          <Route path="/grade" element={<ProtectedRoute requireRole="educator"><GradeQuiz/></ProtectedRoute>} />
+          <Route path="/grade/feedback" element={<ProtectedRoute requireRole="educator"><QuizFeedback/></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

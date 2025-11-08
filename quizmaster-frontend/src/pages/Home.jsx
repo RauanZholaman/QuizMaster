@@ -5,10 +5,10 @@ import { BookOpen, FileText, BarChart3, PenTool, Trophy, TrendingUp } from "luci
 import "./Home.css";
 
 export default function Home() {
-  const { user, role } = useAuth();
+  const { user, role, profile } = useAuth();
   
   // Get first name from email or use email
-  const displayName = user?.email?.split('@')[0] || 'User';
+  const displayName = profile?.firstName || user?.email?.split('@')[0] || 'User'; // Priority first name. If not given, then email or user.
 
   // Quick action cards based on role
   const educatorActions = [

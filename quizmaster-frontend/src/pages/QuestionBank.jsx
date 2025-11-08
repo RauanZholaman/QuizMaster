@@ -6,6 +6,7 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { useDebounce } from "use-debounce";
 
 const QUESTIONS_COLLECTION = 'questionBank';
 
@@ -32,13 +33,14 @@ export default function QuestionBank() {
         total: 0,
         published: 0,
         drafts: 0,
-        categories: 0,
+        categories: 0,  // Instead of 'Categories: 0'
         easy: 0,
         medium: 0,
         hard: 0
     });
-    const [activeFilter, setActiveFilter] = useState('All Questions');
+    const [activeFilter, setActiveFilter] = useState([]);
     const [search, setSearch] = useState('');
+    const [debouncedSearch] = useDebounce(search, 400);
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -56,7 +58,7 @@ export default function QuestionBank() {
                     easy: 0,
                     medium: 0,
                     hard: 0,
-                    categories: new Set(),
+                    categories: new Set(), // Instead of Categories
                 }; 
 
                 // Map the documents to an array of objects
@@ -131,17 +133,39 @@ export default function QuestionBank() {
 
     const getFilteredQuestions = () => {
 
-        if (activeFilter === 'All Questions') {
+        if (activeFilter.includes('All Questions')) {
             return questions;
         }
 
         return questions.filter(q => {
 
-            if (activeFilter === 'Easy' && q.difficulty && q.difficulty.easy)
-                return true;
+            const matchesDifficulty = 
+                (activeFilter.includes('Easy') && q.difficulty.easy) ||
+                (activeFilter.includes('Medium') && q.difficulty.medium) ||
+                (activeFilter.includes('Hard') && q.difficulty.hard) ||
+                !activeFilter.some(f => ['Easy', 'Medium', 'Hard'].includes(f));   
 
-            if (activeFilter === 'Medium' && q.difficulty && q.difficulty.medium);
-                return true;
+            const matchesStatus =
+                (activeFilter.includes('Published') && q.status.includes('published')) ||
+                (activeFilter.includes('Draft') && q.status.includes('draft')) ||
+                !activeFilter.some(f => ['Published', 'Draft'].includes(f));
+
+            return matchesDifficulty && matchesStatus;
+ 
+            // if (activeFilter.includes('Easy') && q.difficulty && q.difficulty.easy)
+            //     return true;
+
+            // if (activeFilter.includes('Medium') && q.difficulty && q.difficulty.medium)
+            //     return true;
+
+            // if (activeFilter.includes('Hard') && q.difficulty && q.difficulty.hard)
+            //     return true;
+
+            // if (activeFilter.includes('Published'))
+            //     return q.status.includes('published');
+
+            // if (activeFilter.includes('Draft'))
+            //     return q.status.includes('draft');
         });
     };
 
@@ -164,8 +188,9 @@ export default function QuestionBank() {
                         {questionsToDisplay.filter((q) => {
                             return search.toLowerCase() === ''
                                 ? q
-                                : q.question.toLowerCase().includes(search);
+                                : q.question.toLowerCase().includes(debouncedSearch.toLowerCase());
                         }).map((q) => (
+
                         <div key={q.firestoreId} className="Question-Bank-Row">
                             <div>{q.question}</div>
                             <div>{q.type}</div>
@@ -180,6 +205,7 @@ export default function QuestionBank() {
                                 <AiOutlineSave/>
                             </div>
                         </div>
+
                         ))}
                     </div>
                 </div>
@@ -195,22 +221,35 @@ export default function QuestionBank() {
 function SelectionGrid({stats, activeFilter, onFilterChange}) {
 
     const handleBoxClick = (filterName) => {
-        onFilterChange(filterName);
+        if (activeFilter.includes(filterName)) {
+            onFilterChange(activeFilter.filter(f => f !== filterName));
+        } else {
+            onFilterChange([...activeFilter, filterName]);
+        }
     };
 
-    const isActive = (filterName) => { return activeFilter === filterName ? 'active-box' : '' };
+    const isActive = (filterName) => activeFilter.includes(filterName) ? 'active-box' : '';
 
     return (
         <div className="Selection-Question">
-            <div className="box-select">
+            <div
+                onClick={() => handleBoxClick('All Questions')}
+                className={`box-select ${isActive('All Questions')}`}
+                >
                 <div className="box-top">{stats.total}</div>
                 <div className="box-bottom">All Questions</div>
             </div>
-            <div className="box-select">
+            <div
+                onClick={() => handleBoxClick('Published')}
+                className={`box-select ${isActive('Published')}`}
+                >
                 <div className="box-top">{stats.published}</div>
                 <div className="box-bottom">Published</div>
             </div>
-            <div className="box-select">
+            <div
+                onClick={() => handleBoxClick('Draft')}
+                className={`box-select ${isActive('Draft')}`}
+                >
                 <div className="box-top">{stats.drafts}</div>
                 <div className="box-bottom">Drafts</div>
             </div>
@@ -218,18 +257,24 @@ function SelectionGrid({stats, activeFilter, onFilterChange}) {
                 <div className="box-top">{stats.categories}</div>
                 <div className="box-bottom">Categories</div>
             </div>
-            <div className="box-select">
+            <div
+                onClick={() => handleBoxClick('Easy')}
+                className={`box-select ${isActive('Easy')}`}
+                >
                 <div className="box-top">{stats.easy}</div>
                 <div className="box-bottom">Easy</div>
             </div>
             <div
                 onClick={() => handleBoxClick('Medium')}
-                className={`box-select${isActive('Medium')}`}
+                className={`box-select ${isActive('Medium')}`}
                 >
                 <div className="box-top">{stats.medium}</div>
                 <div className="box-bottom">Medium</div>
             </div>
-            <div className="box-select">
+            <div
+                onClick={() => handleBoxClick('Hard')}
+                className={`box-select ${isActive('Hard')}`}
+                >
                 <div className="box-top">{stats.hard}</div>
                 <div className="box-bottom">Hard</div>
             </div>
@@ -240,7 +285,8 @@ function SelectionGrid({stats, activeFilter, onFilterChange}) {
 //
 // This component displays filter options above the Question Bank Table
 //
-function FilterBar({search, setSearch}) {
+function FilterBar({setSearch}) {
+
     return (
         <div className="Question-Bank-Filter">
             <div className="filter-left">

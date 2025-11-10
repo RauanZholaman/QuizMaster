@@ -36,11 +36,13 @@ export default function QuestionBank() {
         categories: 0,  // Instead of 'Categories: 0'
         easy: 0,
         medium: 0,
-        hard: 0
+        hard: 0,
+        type: 0
     });
     const [activeFilter, setActiveFilter] = useState([]);
     const [search, setSearch] = useState('');
     const [debouncedSearch] = useDebounce(search, 400);
+    const [typeFilter, setTypeFilter] = useState([]);
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -59,6 +61,7 @@ export default function QuestionBank() {
                     medium: 0,
                     hard: 0,
                     categories: new Set(), // Instead of Categories
+                    type: 0,
                 }; 
 
                 // Map the documents to an array of objects
@@ -133,8 +136,14 @@ export default function QuestionBank() {
 
     const getFilteredQuestions = () => {
 
+        let result = questions;
+
         if (activeFilter.includes('All Questions')) {
             return questions;
+        }
+
+        if (typeFilter.length > 0) {
+            return result = result.filter(q => typeFilter.includes(q.type));
         }
 
         return questions.filter(q => {
@@ -151,21 +160,6 @@ export default function QuestionBank() {
                 !activeFilter.some(f => ['Published', 'Draft'].includes(f));
 
             return matchesDifficulty && matchesStatus;
- 
-            // if (activeFilter.includes('Easy') && q.difficulty && q.difficulty.easy)
-            //     return true;
-
-            // if (activeFilter.includes('Medium') && q.difficulty && q.difficulty.medium)
-            //     return true;
-
-            // if (activeFilter.includes('Hard') && q.difficulty && q.difficulty.hard)
-            //     return true;
-
-            // if (activeFilter.includes('Published'))
-            //     return q.status.includes('published');
-
-            // if (activeFilter.includes('Draft'))
-            //     return q.status.includes('draft');
         });
     };
 
@@ -175,7 +169,10 @@ export default function QuestionBank() {
         <div className="Question-Bank-Content">
             <SelectionGrid stats={stats} activeFilter={activeFilter} onFilterChange={setActiveFilter}/>
             <div>
-                <FilterBar search={search} setSearch={setSearch}/>
+                <FilterBar search={search} 
+                           setSearch={setSearch} 
+                           typeFilter={typeFilter} 
+                           onTypeFilterChange={setTypeFilter} />
                 <div className="Question-Bank-Table">
                     <div className="Question-Bank-Header">
                         <div>Question</div>
@@ -285,7 +282,26 @@ function SelectionGrid({stats, activeFilter, onFilterChange}) {
 //
 // This component displays filter options above the Question Bank Table
 //
-function FilterBar({setSearch}) {
+function FilterBar({setSearch, typeFilter, onTypeFilterChange}) {
+
+    // const handleBoxClick = (filterName) => {
+    //     if (activeFilter.includes(filterName)) {
+    //         onFilterChange(activeFilter.filter(f => f !== filterName));
+    //     } else {
+    //         onFilterChange([...activeFilter, filterName]);
+    //     }
+    // };
+
+    // const isActive = (filterName) => activeFilter.includes(filterName) ? 'active-box' : '';
+    const handleTextClick = (type) => {
+        if (typeFilter.includes(type)) {
+            onTypeFilterChange(typeFilter.filter(t => t !== type));
+        } else {
+            onTypeFilterChange([...typeFilter, type]);
+        }
+    }
+
+    const isActive = (type) => typeFilter.includes(type) ? 'active-type' : '';
 
     return (
         <div className="Question-Bank-Filter">
@@ -293,10 +309,18 @@ function FilterBar({setSearch}) {
                 <div><LuFilter size="20px"/></div>
                 <div>Filter</div>
                 <div className="filter-type">
-                    <div>MSQ</div>
-                    <div>T/F</div>
-                    <div>Short Answer</div>
-                    <div>Matching</div>
+                    <div onClick={() => handleTextClick('MCQ')}
+                         className={`type-filter ${isActive('MCQ')}`}
+                        >MCQ</div>
+                    <div onClick={() => handleTextClick('TRUE_FALSE')}
+                         className={`type-filter ${isActive('TRUE_FALSE')}`}
+                        >T/F</div>
+                    <div onClick={() => handleTextClick('SHORT_ANSWER')}
+                         className={`type-filter ${isActive('SHORT_ANSWER')}`}
+                        >Short Answer</div>
+                    <div onClick={() => handleTextClick('FILL_BLANK')}
+                         className={`type-filter ${isActive('FILL_BLANK')}`}
+                        >Fill Blank</div>
                 </div>
             </div>
 

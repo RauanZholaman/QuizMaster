@@ -244,3 +244,9 @@
   border-radius: 8px;
   font-size: 0.9rem;
 }
+
+.type-filter.active-type  {
+  /* background-color: #e8def8; */
+  color: #6750a4 ;
+  text-decoration: underline;
+}

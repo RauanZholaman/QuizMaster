@@ -12,6 +12,7 @@ import QuestionBank from "./pages/QuestionBank";
 
 import Dashboard from "./pages/Dashboard";
 import QuizSelection from "./pages/QuizSelection.jsx";
+import QuizIntro from "./pages/QuizIntro.jsx"; 
 import QuestionViewer from "./pages/QuestionViewer.jsx";
 import ResultPage from "./pages/ResultPage.jsx";
 

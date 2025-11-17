@@ -15,6 +15,7 @@ import QuestionBank from "../src/pages/QuestionBank";
 import Dashboard from "../src/pages/Dashboard";
 
 import QuizSelection from "../src/pages/QuizSelection";
+import QuizIntro from "../src/pages/QuizIntro"; 
 import QuestionViewer from "../src/pages/QuestionViewer";
 import ResultPage from "../src/pages/ResultPage";
 
@@ -66,6 +67,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <QuizSelection />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quiz/:id/intro"
+          element={
+            <ProtectedRoute>
+              <QuizIntro />
             </ProtectedRoute>
           }
         />

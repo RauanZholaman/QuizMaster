@@ -47,7 +47,8 @@ export default function App() {
           >
             <Route path="auto" element={<AutoGenerate />} />
           </Route>
-          <Route path="/question-bank" element={<ProtectedRoute requireRole="educator"><QuestionBank/></ProtectedRoute>} />
+          {/* Allow both students and educators to view the Question Bank; component will enforce read-only for students */}
+          <Route path="/question-bank" element={<ProtectedRoute><QuestionBank/></ProtectedRoute>} />
 
           <Route path="/dashboard" element={<ProtectedRoute requireRole="educator"><Dashboard/></ProtectedRoute>} />
 

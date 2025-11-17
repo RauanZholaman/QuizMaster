@@ -144,7 +144,7 @@
 .box-select {
   flex: 1;
   display: flex;
- -direction: column;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 70px;
@@ -157,6 +157,12 @@
 
 .box-select:hover {
   background-color: #e8def8;
+  border-color: #6750a4;
+}
+
+.box-select.active-box {
+  background-color: #e8def8;
+  border-color: #6750a4 ;
   border-color: #6750a4;
 }
 
@@ -212,6 +218,11 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 0.9rem;
+}
+
+.type-filter.active-type  {
+  color: #6750a4 ;
+  text-decoration: underline;
 }
 
 /* ===== Quiz viewer layout ===== */

@@ -57,7 +57,8 @@ export default function CreateQuiz() {
         timeLimit: 7,
         allowedAttempts: 5,
         shuffle: false,
-        questions: []
+        questions: [],
+        status: ''
     });
     const [newTag, setNewTag] = useState('');
     const [showTagInput, setShowTagInput] = useState(false);
@@ -549,6 +550,16 @@ export default function CreateQuiz() {
             return;
         }
 
+        const difficultySelected = 
+            quizData.difficulty.easy ||
+            quizData.difficulty.medium ||
+            quizData.difficulty.hard;
+
+        if (!difficultySelected) {
+            alert('Please select one difficulty level');
+            return;
+        }
+
         const payload = {
             title: quizData.title,
             description: quizData.description,
@@ -577,11 +588,14 @@ export default function CreateQuiz() {
                     qb.quizId = quizRef.id;
                     qb.ownerId = user.uid;
                     qb.createdAt = serverTimestamp();
+                    qb.difficulty = quizData.difficulty;
+                    // qb.status = quizData.status;
+                    qb.status = 'published';
                     promises.push(addDoc(questionBankCol, qb));
                 }
             });
             await Promise.all(promises);
-            alert('Quiz published successfully.');
+            alert('Quiz published successfully.');  // SUBJECT TO REMOVAL -- Not sure if this looks nice. Maybe display a simple tab with a nicer look?
             // Optionally clear form
             setQuizData({
                 title: '',
@@ -592,7 +606,8 @@ export default function CreateQuiz() {
                 timeLimit: 7,
                 allowedAttempts: 5,
                 shuffle: false,
-                questions: []
+                questions: [],
+                status: ''
             });
             setCreationType(null);
         } catch (err) {

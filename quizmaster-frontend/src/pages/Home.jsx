@@ -5,10 +5,10 @@ import { BookOpen, FileText, BarChart3, PenTool, Trophy, TrendingUp } from "luci
 import "./Home.css";
 
 export default function Home() {
-  const { user, role } = useAuth();
+  const { user, role, profile } = useAuth();
   
   // Get first name from email or use email
-  const displayName = user?.email?.split('@')[0] || 'User';
+  const displayName = profile?.firstName || user?.email?.split('@')[0] || 'User'; // Priority first name. If not given, then email or user.
 
   // Quick action cards based on role
   const educatorActions = [
@@ -47,14 +47,14 @@ export default function Home() {
       title: "My Results",
       description: "View your quiz scores",
       icon: <Trophy size={32} />,
-      link: "/dashboard",
+      link: "",
       color: "#8b5cf6"
     },
     {
       title: "Progress",
       description: "Track your learning journey",
       icon: <TrendingUp size={32} />,
-      link: "/dashboard",
+      link: "",
       color: "#a78bfa"
     }
   ];

@@ -10,32 +10,50 @@ export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     if (!auth) {
       setLoading(false);
       return;
     }
+
+
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u || null);
+
+
       try {
         if (u) {
           const snap = await getDoc(doc(db, "users", u.uid));
+
+          const data = snap.exists() ? snap.data() : null;
+
           // Prefer role from Firestore; during local dev allow optional override via env or localStorage
-          if (snap.exists()) {
-            setRole(snap.data().role || null);
+          const roleFromDB = data?.role ?? null;
+          const devOverride =
+            (process.env.NODE_ENV !== "production" && (process.env.REACT_APP_DEFAULT_ROLE || localStorage.getItem("devRole"))) ||
+            null;
+          setRole(roleFromDB ?? devOverride);
+
+          // Set profile details if available
+          if (data) {
+            setProfile({
+              firstName: data.firstName || "",
+              lastName: data.lastName || "",
+              ...data,
+            });
           } else {
-            // Dev-friendly default role to unblock navigation when the user doc isn't set up yet
-            const devOverride =
-              (process.env.NODE_ENV !== 'production' && (process.env.REACT_APP_DEFAULT_ROLE || localStorage.getItem('devRole'))) ||
-              null;
-            setRole(devOverride);
+            setProfile(null);
           }
         } else {
+          // Profile and Role resets on logout
           setRole(null);
+          setProfile(null);
         }
       } catch {
         setRole(null);
+        setProfile(null);
       } finally {
         setLoading(false);
       }
@@ -44,7 +62,7 @@ export default function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthCtx.Provider value={{ user, role, loading }}>
+    <AuthCtx.Provider value={{ user, role, loading, profile }}>
       {!loading && children}
     </AuthCtx.Provider>
   );

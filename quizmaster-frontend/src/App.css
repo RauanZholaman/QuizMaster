@@ -181,6 +181,11 @@
 }
 
 .box-select:hover {
+  background-color: #f7f2f2;
+  border-color: #bcbcbd ;
+}
+
+.box-select.active-box {
   background-color: #e8def8;
   border-color: #6750a4 ;
 }
@@ -238,4 +243,10 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 0.9rem;
+}
+
+.type-filter.active-type  {
+  /* background-color: #e8def8; */
+  color: #6750a4 ;
+  text-decoration: underline;
 }

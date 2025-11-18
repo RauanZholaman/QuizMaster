@@ -1,14 +1,14 @@
 // src/pages/Home.jsx
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
-import { BookOpen, FileText, BarChart3, PenTool, Trophy, TrendingUp } from "lucide-react";
+import { BookOpen, FileText, BarChart3, PenTool, Trophy } from "lucide-react";
 import "./Home.css";
 
 export default function Home() {
   const { user, role, profile } = useAuth();
   
   // Get first name from email or use email
-  const displayName = profile?.firstName || user?.email?.split('@')[0] || 'User'; // Priority first name. If not given, then email or user.
+  const displayName = profile?.firstName || user?.email?.split('@')[0] || 'User';
 
   // Quick action cards based on role
   const educatorActions = [
@@ -25,13 +25,6 @@ export default function Home() {
       icon: <BookOpen size={32} />,
       link: "/question-bank",
       color: "#8b5cf6"
-    },
-    {
-      title: "Dashboard",
-      description: "View student performance & analytics",
-      icon: <BarChart3 size={32} />,
-      link: "/dashboard",
-      color: "#a78bfa"
     }
   ];
 
@@ -49,13 +42,6 @@ export default function Home() {
       icon: <Trophy size={32} />,
       link: "",
       color: "#8b5cf6"
-    },
-    {
-      title: "Progress",
-      description: "Track your learning journey",
-      icon: <TrendingUp size={32} />,
-      link: "",
-      color: "#a78bfa"
     }
   ];
 
@@ -94,31 +80,6 @@ export default function Home() {
               <div className="card-arrow">→</div>
             </Link>
           ))}
-        </div>
-      </div>
-
-      {/* Stats Section (Placeholder) */}
-      <div className="stats-section">
-        <h2 className="section-title">Overview</h2>
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-number">0</div>
-            <div className="stat-label">
-              {role === "educator" ? "Quizzes Created" : "Quizzes Taken"}
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">0</div>
-            <div className="stat-label">
-              {role === "educator" ? "Total Students" : "Average Score"}
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">0</div>
-            <div className="stat-label">
-              {role === "educator" ? "Questions Created" : "Completed"}
-            </div>
-          </div>
         </div>
       </div>
 

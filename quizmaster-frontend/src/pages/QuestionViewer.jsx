@@ -290,6 +290,63 @@ export default function QuestionViewer() {
                   );
                 })}
               </div>
+            ) : q.type === "CHECKBOX" ? (
+              <div
+                style={{
+                  maxWidth: "480px",
+                  margin: "0 auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                }}
+              >
+                {(q.options || q.choices || []).map((opt, i) => {
+                  const value = typeof opt === "string" ? opt : String(opt);
+                  const selectedAnswers = answers[q.id] || [];
+                  const checked = Array.isArray(selectedAnswers) 
+                    ? selectedAnswers.includes(value)
+                    : false;
+                  
+                  return (
+                    <label
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        padding: "10px 12px",
+                        borderRadius: "999px",
+                        border: checked
+                          ? "2px solid #ec4899"
+                          : "1px solid #e5e7eb",
+                        background: checked ? "#fee2e2" : "#ffffff",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          let newAnswers;
+                          if (e.target.checked) {
+                            // Add to array
+                            newAnswers = Array.isArray(selectedAnswers)
+                              ? [...selectedAnswers, value]
+                              : [value];
+                          } else {
+                            // Remove from array
+                            newAnswers = Array.isArray(selectedAnswers)
+                              ? selectedAnswers.filter(v => v !== value)
+                              : [];
+                          }
+                          setAnswer(q, newAnswers);
+                        }}
+                      />
+                      <span>{value}</span>
+                    </label>
+                  );
+                })}
+              </div>
             ) : q.type === "TF" || q.type === "TRUE_FALSE" ? (
               <div
                 style={{

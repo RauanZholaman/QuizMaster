@@ -1,13 +1,14 @@
 // src/pages/QuizIntro.jsx
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { listPublishedQuizzes } from "../api";
 
 export default function QuizIntro() {
   const { id: subjectId } = useParams(); // e.g. "maths"
   const nav = useNavigate();
   const location = useLocation();
 
+  // Get quiz object directly from navigation state
+  const quiz = location.state?.quiz || null;
   const subjectFromState = location.state?.subject || "";
   const category = location.state?.category || "";
 
@@ -18,67 +19,16 @@ export default function QuizIntro() {
       ? "Maths"
       : subjectId.charAt(0).toUpperCase() + subjectId.slice(1));
 
-  const [quiz, setQuiz] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState(null);
+  const [err] = useState(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const all = await listPublishedQuizzes();
-
-        const sLower = niceSubject.toLowerCase();
-
-        // Prefer subject match
-        let matches = all.filter((q) =>
-          (q.subject || "").toLowerCase().includes(sLower)
-        );
-
-        // If no subject match, try title match
-        if (!matches.length) {
-          matches = all.filter((q) =>
-            (q.title || "").toLowerCase().includes(sLower)
-          );
-        }
-
-        const chosen = matches[0] || all[0] || null;
-
-        if (!cancelled) {
-          if (!chosen) {
-            setErr("No quiz found in Firestore.");
-          } else {
-            setQuiz(chosen);
-          }
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setErr(e?.message || "Failed to load quiz metadata.");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [niceSubject]);
-
-  if (loading) {
-    return <div className="p-6">Loading quiz info…</div>;
-  }
-  if (err) {
-    return <div className="p-6 text-red-600">Error: {err}</div>;
-  }
+  // If no quiz was passed, show error
   if (!quiz) {
-    return <div className="p-6">No quiz available.</div>;
+    return <div className="p-6 text-red-600">Error: Quiz data not found. Please select a quiz from the quiz selection page.</div>;
   }
 
   const questionCount = quiz?.questions?.length ?? 0;
   const timeLimitMins = quiz?.timeLimit ?? 10;
-  const titleText = category || quiz.title || niceSubject || "Quiz";
+  const titleText = quiz.title || category || niceSubject || "Quiz";
 
   return (
     <div

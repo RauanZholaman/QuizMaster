@@ -77,20 +77,13 @@ export default function CreateQuiz() {
         subject: '', // Human-readable subject name
         subcategory: '', // Topic/subtopic within category
         quizType: '',
-        difficulty: {
-            easy: false,
-            medium: false,
-            hard: false
-        },
-        tags: [],
+        difficulty: '',
         timeLimit: 7,
         allowedAttempts: 5,
         shuffle: false,
         questions: [],
         status: ''
     });
-    const [newTag, setNewTag] = useState('');
-    const [showTagInput, setShowTagInput] = useState(false);
 
     const handleManualCreation = () => {
         setCreationType('manual');
@@ -114,32 +107,7 @@ export default function CreateQuiz() {
     const handleDifficultyChange = (level) => {
         setQuizData(prev => ({
             ...prev,
-            difficulty: {
-                ...prev.difficulty,
-                [level]: !prev.difficulty[level]
-            }
-        }));
-    };
-
-    const handleAddTag = () => {
-        if (!showTagInput) {
-            setShowTagInput(true);
-            return;
-        }
-        if (newTag.trim() && !quizData.tags.includes(newTag.trim())) {
-            setQuizData(prev => ({
-                ...prev,
-                tags: [...prev.tags, newTag.trim()]
-            }));
-            setNewTag('');
-        }
-        setShowTagInput(false);
-    };
-
-    const handleRemoveTag = (tagToRemove) => {
-        setQuizData(prev => ({
-            ...prev,
-            tags: prev.tags.filter(tag => tag !== tagToRemove)
+            difficulty: level
         }));
     };
 
@@ -353,50 +321,32 @@ export default function CreateQuiz() {
                     <div className="difficulty-options">
                         <label>
                             <input 
-                                type="checkbox"
-                                checked={quizData.difficulty.easy}
+                                type="radio"
+                                name="difficulty"
+                                value="easy"
+                                checked={quizData.difficulty === 'easy'}
                                 onChange={() => handleDifficultyChange('easy')}
                             /> Easy
                         </label>
                         <label>
                             <input 
-                                type="checkbox"
-                                checked={quizData.difficulty.medium}
+                                type="radio"
+                                name="difficulty"
+                                value="medium"
+                                checked={quizData.difficulty === 'medium'}
                                 onChange={() => handleDifficultyChange('medium')}
                             /> Medium
                         </label>
                         <label>
                             <input 
-                                type="checkbox"
-                                checked={quizData.difficulty.hard}
+                                type="radio"
+                                name="difficulty"
+                                value="hard"
+                                checked={quizData.difficulty === 'hard'}
                                 onChange={() => handleDifficultyChange('hard')}
                             /> Hard
                         </label>
                     </div>
-                </div>
-                <div className="form-group">
-                    <label>Tags</label>
-                    <div className="tags-container">
-                        {quizData.tags.map((tag, index) => (
-                            <span key={index} className="tag">
-                                {tag}
-                                <button onClick={() => handleRemoveTag(tag)}>&times;</button>
-                            </span>
-                        ))}
-                    </div>
-                    {showTagInput ? (
-                        <div className="tag-input-container">
-                            <input
-                                type="text"
-                                value={newTag}
-                                onChange={(e) => setNewTag(e.target.value)}
-                                placeholder="Enter tag"
-                            />
-                            <button onClick={handleAddTag}>Add</button>
-                        </div>
-                    ) : (
-                        <button className="add-tag-btn" onClick={handleAddTag}>+ Add Tag</button>
-                    )}
                 </div>
                 <div className="form-group">
                     <label>Time Limit</label>

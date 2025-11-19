@@ -77,7 +77,11 @@ export default function CreateQuiz() {
         subject: '', // Human-readable subject name
         subcategory: '', // Topic/subtopic within category
         quizType: '',
-        difficulty: '',
+        difficulty: {
+            easy: false,
+            medium: false,
+            hard: false
+        },
         timeLimit: 7,
         allowedAttempts: 5,
         shuffle: false,
@@ -107,7 +111,11 @@ export default function CreateQuiz() {
     const handleDifficultyChange = (level) => {
         setQuizData(prev => ({
             ...prev,
-            difficulty: level
+            difficulty: {
+                easy: level === 'easy',
+                medium: level === 'medium',
+                hard: level === 'hard'
+            }
         }));
     };
 
@@ -324,7 +332,7 @@ export default function CreateQuiz() {
                                 type="radio"
                                 name="difficulty"
                                 value="easy"
-                                checked={quizData.difficulty === 'easy'}
+                                checked={quizData.difficulty.easy}
                                 onChange={() => handleDifficultyChange('easy')}
                             /> Easy
                         </label>
@@ -333,7 +341,7 @@ export default function CreateQuiz() {
                                 type="radio"
                                 name="difficulty"
                                 value="medium"
-                                checked={quizData.difficulty === 'medium'}
+                                checked={quizData.difficulty.medium}
                                 onChange={() => handleDifficultyChange('medium')}
                             /> Medium
                         </label>
@@ -342,7 +350,7 @@ export default function CreateQuiz() {
                                 type="radio"
                                 name="difficulty"
                                 value="hard"
-                                checked={quizData.difficulty === 'hard'}
+                                checked={quizData.difficulty.hard}
                                 onChange={() => handleDifficultyChange('hard')}
                             /> Hard
                         </label>
@@ -565,7 +573,6 @@ export default function CreateQuiz() {
                     subcategory: quizData.subcategory,
                     quizTitle: quizData.title || 'Untitled Quiz',
                     difficulty: quizData.difficulty,
-                    tags: quizData.tags,
                     createdBy: user.uid,
                     createdAt: serverTimestamp(),
                     status: 'draft'
@@ -613,7 +620,7 @@ export default function CreateQuiz() {
             quizData.difficulty.hard;
 
         if (!difficultySelected) {
-            alert('Please select one difficulty level');
+            alert('Please select a difficulty level');
             return;
         }
 
@@ -625,7 +632,6 @@ export default function CreateQuiz() {
             subcategory: quizData.subcategory || '', // Topic/subtopic
             quizType: quizData.quizType,
             difficulty: quizData.difficulty,
-            tags: quizData.tags,
             timeLimit: quizData.timeLimit,
             allowedAttempts: quizData.allowedAttempts,
             shuffle: quizData.shuffle,

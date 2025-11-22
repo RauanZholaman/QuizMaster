@@ -81,14 +81,7 @@ export default function Home() {
             </Link>
           ))}
         </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="home-footer">
-        <p className="footer-title">Group B</p>
-        <p className="footer-names">Ansar • Rauan • Jx • Chan • Thin • May</p>
-        <p className="footer-year">© 2025 QuizMaster</p>
-      </footer>
+      </div>  
     </div>
   );
 }

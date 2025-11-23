@@ -1,11 +1,15 @@
 // src/pages/QuestionViewer.jsx
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function QuestionViewer() {
   const { id: quizId } = useParams(); // e.g. "maths"
   const nav = useNavigate();
   const location = useLocation();
+  const { user, profile } = useAuth();
 
   // quiz object comes from QuizIntro via nav state
   const initialQuiz = location?.state?.quiz || null;
@@ -69,7 +73,7 @@ export default function QuestionViewer() {
     return `${m}:${sec}`;
   }
 
-  function doSubmit(auto = false) {
+  async function doSubmit(auto = false) {
     const elapsed = startAt.current
       ? Math.round((Date.now() - startAt.current) / 1000)
       : 0;
@@ -78,7 +82,31 @@ export default function QuestionViewer() {
       (v) => v !== "" && v != null
     ).length;
 
-    nav(`/result/${quizId}`, {
+    // Save submission to Firestore
+    try {
+      if (user && quiz?.id) {
+        console.log("Saving submission for quiz:", quiz.id);
+        await addDoc(collection(db, "submissions"), {
+          quizId: quiz.id,
+          studentId: user.uid,
+          studentName: profile ? `${profile.firstName} ${profile.lastName}` : (user.displayName || user.email),
+          studentEmail: user.email,
+          answers: answers,
+          submittedAt: serverTimestamp(),
+          graded: false,
+          score: null,
+          timeTaken: elapsed,
+          autoSubmitted: auto
+        });
+        console.log("Submission saved successfully");
+      } else {
+        console.warn("Cannot save submission: User or Quiz ID missing", { user, quizId: quiz?.id });
+      }
+    } catch (error) {
+      console.error("Error saving submission:", error);
+    }
+
+    nav(`/result/${quiz?.id || quizId}`, {
       state: {
         title: quiz?.title,
         total: quiz?.questions?.length || 0,

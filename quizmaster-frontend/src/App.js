@@ -19,6 +19,9 @@ import QuestionViewer from "../src/pages/QuestionViewer";
 import ResultPage from "../src/pages/ResultPage";
 import GradeQuiz from "../src/pages/GradeQuiz";
 import QuizFeedback from "../src/pages/QuizFeedback";
+import QuizSubmissions from "../src/pages/QuizSubmissions";
+import StudentResults from "../src/pages/StudentResults";
+import StudentSubmissionDetail from "../src/pages/StudentSubmissionDetail";
 
 export default function App() {
   return (
@@ -64,8 +67,29 @@ export default function App() {
           }
         />
 
+        <Route path="/quiz/:id/submissions" element={<ProtectedRoute requireRole="educator"><QuizSubmissions/></ProtectedRoute>} />
         <Route path="/grade" element={<ProtectedRoute requireRole="educator"><GradeQuiz/></ProtectedRoute>} />
+        <Route path="/grade/:submissionId" element={<ProtectedRoute requireRole="educator"><GradeQuiz/></ProtectedRoute>} />
         <Route path="/grade/feedback" element={<ProtectedRoute requireRole="educator"><QuizFeedback/></ProtectedRoute>} />
+        <Route path="/grade/feedback/:submissionId" element={<ProtectedRoute requireRole="educator"><QuizFeedback/></ProtectedRoute>} />
+
+        {/* Student Results Flow */}
+        <Route 
+          path="/my-results" 
+          element={
+            <ProtectedRoute>
+              <StudentResults />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/my-results/:submissionId" 
+          element={
+            <ProtectedRoute>
+              <StudentSubmissionDetail />
+            </ProtectedRoute>
+          } 
+        />
 
         {/* NEW quiz-taking flow */}
         <Route

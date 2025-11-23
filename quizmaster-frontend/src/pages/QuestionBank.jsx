@@ -5,6 +5,7 @@ import { AiOutlineDelete } from 'react-icons/ai';
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
+import { useAuth } from '../context/AuthContext';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { useDebounce } from "use-debounce";
 
@@ -21,6 +22,8 @@ const getDifficultyLabel = (difficultyObject) => {
 };
 
 export default function QuestionBank() {
+    const { role } = useAuth();
+    const canEdit = role === 'educator';
 
     const [questions, setQuestionsData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -97,6 +100,7 @@ export default function QuestionBank() {
     }, [activeFilter, typeFilter, debouncedSearch]);
 
     const handleDelete = async (questionFirestoreId) => {
+        if (!canEdit) return; // Safety: students cannot delete
         try {
             const docRef = doc(db, QUESTIONS_COLLECTION, questionFirestoreId);
             await deleteDoc(docRef);
@@ -164,8 +168,13 @@ export default function QuestionBank() {
         if (currentPage > 1) setCurrentPage(prev => prev - 1);
     };
 
-    return (
+        return (
         <div className="Question-Bank-Content">
+                        { !canEdit && (
+                            <div style={{background:'#fff3cd', border:'1px solid #ffe58f', padding:12, borderRadius:6, marginBottom:12}}>
+                                Read-only view: as a student you can browse questions but not edit or delete them.
+                            </div>
+                        ) }
             <SelectionGrid stats={stats} activeFilter={activeFilter} onFilterChange={setActiveFilter}/>
             <div>
                 <FilterBar search={search} 
@@ -178,7 +187,7 @@ export default function QuestionBank() {
                         <div>Question</div>
                         <div>Type</div>
                         <div>Difficulty</div>
-                        <div>Actions</div>
+                                                <div>{canEdit ? 'Actions' : ' '}</div>
                     </div>
 
                     <div className="Question-Bank-Body">
@@ -189,11 +198,17 @@ export default function QuestionBank() {
                                     <div>{q.type}</div>
                                     <div>{getDifficultyLabel(q.difficulty)}</div>
                                     <div className="action-icons">
-                                        <FiEdit2/> 
-                                        <span onClick={() => handleDelete(q.firestoreId)} style={{cursor:'pointer'}}>
-                                            <AiOutlineDelete /> 
-                                        </span>
-                                        <AiOutlineSave/>
+                                        {canEdit ? (
+                                            <>
+                                                <FiEdit2/> 
+                                                <span onClick={() => handleDelete(q.firestoreId)} style={{cursor:'pointer'}}>
+                                                    <AiOutlineDelete /> 
+                                                </span>
+                                                <AiOutlineSave/>
+                                            </>
+                                        ) : (
+                                            <span style={{opacity:0.5, fontSize:12}}>—</span>
+                                        )}
                                     </div>
                                 </div>
                             ))

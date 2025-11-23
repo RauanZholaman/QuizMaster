@@ -26,15 +26,26 @@ export default function AuthProvider({ children }) {
       try {
         if (u) {
           const snap = await getDoc(doc(db, "users", u.uid));
+
           const data = snap.exists() ? snap.data() : null;
 
-          setRole(snap.exists() ? snap.data().role : null);
+          // Prefer role from Firestore; during local dev allow optional override via env or localStorage
+          const roleFromDB = data?.role ?? null;
+          const devOverride =
+            (process.env.NODE_ENV !== "production" && (process.env.REACT_APP_DEFAULT_ROLE || localStorage.getItem("devRole"))) ||
+            null;
+          setRole(roleFromDB ?? devOverride);
 
-          setProfile({
-            firstName: data.firstName || "",
-            lastName: data.lastName || "",
-            ...data
-          })
+          // Set profile details if available
+          if (data) {
+            setProfile({
+              firstName: data.firstName || "",
+              lastName: data.lastName || "",
+              ...data,
+            });
+          } else {
+            setProfile(null);
+          }
         } else {
           // Profile and Role resets on logout
           setRole(null);

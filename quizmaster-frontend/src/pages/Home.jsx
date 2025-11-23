@@ -25,6 +25,13 @@ export default function Home() {
       icon: <BookOpen size={32} />,
       link: "/question-bank",
       color: "#8b5cf6"
+    },
+    {
+      title: "View Submissions",
+      description: "Review student quiz attempts",
+      icon: <BarChart3 size={32} />,
+      link: "/dashboard",
+      color: "#ec4899"
     }
   ];
 
@@ -40,7 +47,7 @@ export default function Home() {
       title: "My Results",
       description: "View your quiz scores",
       icon: <Trophy size={32} />,
-      link: "",
+      link: "/my-results",
       color: "#8b5cf6"
     }
   ];

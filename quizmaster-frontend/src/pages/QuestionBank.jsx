@@ -3,11 +3,12 @@ import { FiEdit2 } from 'react-icons/fi';
 import { AiOutlineSave } from 'react-icons/ai';
 import { AiOutlineDelete } from 'react-icons/ai';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
-import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { useDebounce } from "use-debounce";
+import EditQuestionModal from "../pages/EditQuestionModal.jsx";
 
 const QUESTIONS_COLLECTION = 'questionBank';
 
@@ -20,6 +21,7 @@ const getDifficultyLabel = (difficultyObject) => {
     }
     return 'Unknown';
 };
+
 
 export default function QuestionBank() {
     const { role } = useAuth();
@@ -44,11 +46,14 @@ export default function QuestionBank() {
     const [search, setSearch] = useState('');
     const [debouncedSearch] = useDebounce(search, 400);
     const [typeFilter, setTypeFilter] = useState([]);
-
+    
     // Pagination States
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-
+    
+    // Question editing
+    const [editingQuestion, setEditingQuestion] = useState(null);
+   
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
@@ -168,6 +173,46 @@ export default function QuestionBank() {
         if (currentPage > 1) setCurrentPage(prev => prev - 1);
     };
 
+    // --- QUESTION EDITING ---
+
+    // Triggered when Pencil icon is clicked
+    const handleEditClick = (question) => {
+        setEditingQuestion(question);
+    };
+
+    // Triggered when "Save" is clicked in Modal
+    const handleUpdateQuestion = async (docId, updatedData) => {
+    // 1. Validation
+    if (!docId) {
+        console.error("❌ Error: docId is missing. Data:", updatedData);
+        alert("Cannot update: Missing Question ID");
+        return;
+    }
+
+    try {
+        console.log(`🔄 Updating document: ${docId}`);
+        const docRef = doc(db, QUESTIONS_COLLECTION, docId);
+        
+        // 2. Update Firestore
+        await updateDoc(docRef, updatedData);
+
+        // 3. Update Local State (UI)
+        setQuestionsData(prev => prev.map(q => 
+            // Check both potential ID names to be safe
+            (q.firestoreId === docId || q.id === docId) 
+                ? { ...q, ...updatedData } 
+                : q
+        ));
+
+        setEditingQuestion(null);
+        console.log("✅ Document successfully updated!");
+
+    } catch (error) {
+        console.error("❌ Error updating document: ", error);
+        alert(`Failed to update: ${error.message}`);
+    }
+};
+
         return (
         <div className="Question-Bank-Content">
                         { !canEdit && (
@@ -187,7 +232,7 @@ export default function QuestionBank() {
                         <div>Question</div>
                         <div>Type</div>
                         <div>Difficulty</div>
-                                                <div>{canEdit ? 'Actions' : ' '}</div>
+                        <div>{canEdit ? 'Actions' : ' '}</div>
                     </div>
 
                     <div className="Question-Bank-Body">
@@ -200,7 +245,10 @@ export default function QuestionBank() {
                                     <div className="action-icons">
                                         {canEdit ? (
                                             <>
-                                                <FiEdit2/> 
+                                                <span onClick={() => handleEditClick(q)} style={{cursor: 'pointer'}}>
+                                                    <FiEdit2/>
+                                                </span>
+
                                                 <span onClick={() => handleDelete(q.firestoreId)} style={{cursor:'pointer'}}>
                                                     <AiOutlineDelete /> 
                                                 </span>
@@ -250,6 +298,14 @@ export default function QuestionBank() {
                         </div>
                     )}
                 </div>
+
+                {editingQuestion && (
+                    <EditQuestionModal 
+                        question={editingQuestion}
+                        onClose={() => setEditingQuestion(null)}
+                        onSave={handleUpdateQuestion}
+                    />
+                )}
             </div>
         </div>
     );

@@ -4,7 +4,7 @@ import React from 'react';
 const teamMembers = [
     { name: 'Ansar', link: 'https://www.linkedin.com/in/ansar-daniyaruly/' },
     { name: 'Rauan', link: 'https://www.linkedin.com/in/rauan-zholaman/' },
-    { name: 'Jx',    link: '#' },
+    { name: 'Jian Xin', link: 'https://www.linkedin.com/in/jian-xin-png-8790a6163/' },
     { name: 'Chan',  link: 'https://www.linkedin.com/in/chan-myae-thinzar-tun-2249a2364/' },
     { name: 'Thin',  link: '#' },
     { name: 'May',   link: 'https://www.linkedin.com/in/may-thu-kyaing-838664364/' },

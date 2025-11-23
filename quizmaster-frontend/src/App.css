@@ -1,3 +1,15 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Forces container to be at least the height of the screen */
+}
+
+.main-content {
+  flex: 1; /* This pushes the footer down if content is short */
+  width: 100%;
+  padding-bottom: 80px;
+}
+
 .App {
   text-align: center;
 }
@@ -46,8 +58,7 @@
 
 .container {
   display: grid;
-  grid-template-areas: 
-        "img content";
+  grid-template-areas: "img content";
   grid-template-columns: 1fr 3fr;
   gap: 5px;
   background-color: cadetblue;
@@ -73,39 +84,15 @@
   text-align: justify;
 }
 
-.MyNavbar{
+.MyNavbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  gap: 100; 
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+    0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  gap: 100;
   padding: 20;
 }
-
-
-/* .Question-Bank-Header {
-  border-top: solid;
-  border-left: solid;
-  border-right: solid;
-  display: flex;
-  background-color: #e8def8;
-  margin-top: 20px;
-} */
-
-/* .Question-Bank-Header ul {
-  list-style: none;
-  margin: 7px;
-  padding: 0;
-  text-align: center;
-  flex: 1;
-} */
-
-/* .header-item {
-  flex: 1;
-  text-align: center;
-  padding: 20px;
-} */
-
 
 .Question-Bank-Content {
   padding-left: 5%;
@@ -113,57 +100,95 @@
   max-width: 1200px;
   margin: 0 auto;
 }
+
 .Question-Bank-Table {
-  border: 1px solid #ccc;
-  border-collapse: collapse;
-  width: 100%;
-  font-family: sans-serif;
-  margin-top: 10px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Soft shadow */
+  border: 1px solid rgba(0,0,0,0.05);
+  overflow: hidden; /* Clips children to rounded corners */
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
+/* 2. The Grid Layout (Crucial for Alignment) */
+/* Both Header and Row must use the EXACT same columns */
 .Question-Bank-Header,
 .Question-Bank-Row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 0.8fr; /* adjust proportions */
+  /* 
+     3fr = Question (wide)
+     1.2fr = Type 
+     1fr = Difficulty
+     1fr = Actions (narrow)
+  */
+  grid-template-columns: 3fr 1.2fr 1fr 1fr; 
+  gap: 20px;
   align-items: center;
-  padding: 15px 15px;
+  padding: 18px 24px;
 }
 
+/* 3. Header Specific Styling */
 .Question-Bank-Header {
-  background-color: #ede3f7;
-  font-weight: bold;
-  /* border-bottom: 1px solid #000; */
+  background-color: #f9fafb; /* Light Gray/Blue background */
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280; /* Gray text */
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
+/* 4. Row Specific Styling */
 .Question-Bank-Row {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151; /* Darker gray for content */
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
 }
 
+/* Hover effect for rows */
+.Question-Bank-Row:hover {
+  background-color: #faf5ff; /* Light purple tint on hover */
+}
+
+/* Remove border from the last row so it doesn't clash with footer */
 .Question-Bank-Row:last-child {
   border-bottom: none;
 }
 
+/* 5. Typography Tweaks */
+/* Make the Question Text (first column) stand out */
+.Question-Bank-Row > div:first-child {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* 6. Action Icons Alignment */
 .action-icons {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Align icons to start of their column */
   gap: 15px;
-  font-size: 18px;
+  color: #232424;
 }
 
 .action-icons svg {
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.2s;
 }
 
 .action-icons svg:hover {
-  color: #6a0dad;
+  color: #7c3aed; /* Turn purple on hover */
+  transform: scale(1.1);
 }
 
 .Selection-Question {
   display: flex;
-  gap: 10px;
+  gap: 13px;
   flex-direction: row;
   margin-top: 50px;
+  flex-wrap: wrap; /*Ensure smaller screens appropriately*/
 }
 
 .box-select {
@@ -172,81 +197,415 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 70px;
+  min-height: 80px;
   padding: 5px;
   width: 100px;
   text-align: center;
   border-style: solid;
   border-radius: 15px;
+
+  background: #ffffff;
+  border: 2px solid transparent; /* Invisible border by default */
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Soft shadow */
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .box-select:hover {
-  background-color: #f7f2f2;
-  border-color: #bcbcbd ;
+  transform: translateY(-3px); /* Lifts up slightly on hover */
+  box-shadow: 0 8px 15px rgba(124, 58, 237, 0.15); /* Purple glow shadow */
 }
 
 .box-select.active-box {
-  background-color: #e8def8;
-  border-color: #6750a4 ;
+  background-color: #ffffff;
+  border-color: #7c3aed; /* Theme Purple */
+  color: #7c3aed;
 }
 
 .box-top {
-  font-weight: bold;
-  color: #000;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1f2937; /* Dark gray, almost black */
+  margin-bottom: 4px;
+}
+
+.active-box .box-top {
+  color: #7c3aed; /* Number turns purple when active */
 }
 
 .box-bottom {
-  font-size: 1em;
-  color: #333;
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .Question-Bank-Filter {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 15px;
-  margin-top: 50px;
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
   padding: 0 10px;
+  flex-wrap: wrap; /* Prevents breaking on smaller screens */
+  gap: 20px;
 }
 
+/* Left Side Grouping: Icon + Text + Pills */
 .filter-left {
   display: flex;
+  align-items: center; /* Vertically centers everything */
+  gap: 16px; /* Space between Icon, Label, and Pills */
+  color: #374151;
+}
+
+/* The "Filter" Label */
+.filter-left > div:nth-child(2) {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-right: 8px; /* Extra space before the pills start */
+}
+
+/* The Container for the Pills */
+.filter-type {
+  display: flex;
+  gap: 8px; /* Space between individual pills */
   align-items: center;
+}
+
+/* The Pill Buttons (MCQ, T/F...) */
+.type-filter {
+  padding: 6px 16px;
+  background-color: #ffffff; /* Light gray default */
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap; /* Prevents text from wrapping inside pill */
+}
+
+.type-filter:hover {
+  background-color: #e5e7eb;
+  color: #4b5563;
+}
+
+/* Active State for Pill */
+.type-filter.active-type {
+  background-color: #7c3aed; /* Brand Purple */
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.4);
+}
+
+/* Search Bar Container */
+.question-bank-search {
+  flex-grow: 0; /* Prevents it from stretching too wide */
+}
+
+/* Search Input Styling */
+.question-bank-search input {
+  padding: 8px 16px;
+  width: 250px; /* Fixed width for consistency */
+  border: 1px solid #e5e7eb;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s;
+  background: #ffffff;
+}
+
+.question-bank-search input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+/* Pagination Footer */
+.pagination-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 24px;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== Quiz viewer layout ===== */
+
+.quiz-viewer-wrapper {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px 40px;
+}
+
+.quiz-card {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  padding: 24px 28px 28px;
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.quiz-title {
+  margin: 0;
+  font-size: 22px;
+}
+
+.quiz-subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.quiz-timer {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* progress bar */
+.quiz-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.quiz-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #f3e2f5;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.quiz-progress-bar-fill {
+  height: 100%;
+  background: #ff7bb8;
+  transition: width 0.25s ease;
+}
+
+.quiz-progress-label {
+  font-size: 12px;
+  color: #666;
+  min-width: 38px;
+  text-align: right;
+}
+
+/* question + answers */
+
+.quiz-question-text {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quiz-textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+/* footer buttons */
+
+.quiz-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid #333;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn.primary {
+  background: #ff7bb8;
+  border-color: #ff7bb8;
+  color: #fff;
+}
+
+.btn.secondary:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* error state */
+.quiz-viewer-missing {
+  padding: 32px;
+  max-width: 600px;
+  margin: 40px auto;
+  color: #b00020;
+}
+
+/* Footer */
+.modern-footer {
+  margin-top: auto; /* Ensures it pushes to the bottom in flex layouts */
+  width: 100%;
+  background: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+  backdrop-filter: blur(12px); /* The "Frosted Glass" blur effect */
+  -webkit-backdrop-filter: blur(12px); /* Safari support */
+  border-top: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border */
+  padding: 40px 20px 20px;
+  color: #4b5563;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+/* Section Styling */
+.footer-section h2.footer-logo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 10px;
+  /* Beautiful Gradient Text */
+  background: linear-gradient(135deg, #6a0dad 0%, #ff7bb8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footer-tagline {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #666;
+  max-width: 300px;
+}
+
+.footer-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #1f2937;
+}
+
+/* Team Grid Styling */
+.team-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.team-grid a {
+  background: #f3e8ff; /* Light purple background */
+  color: #6a0dad;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  text-decoration: none; 
+  display: inline-block;
+}
+
+.team-grid a:hover {
+  background: #6a0dad;
+  color: white;
+  transform: translateY(-2px);
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(106, 13, 173, 0.3);
+}
+
+/* Social / Icons */
+.social-icons {
+  display: flex;
   gap: 15px;
 }
 
-.filter-left > div:first-child {
+.icon-placeholder {
+  width: 36px;
+  height: 36px;
+  background: #eee;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  font-size:100%;
-}
-
-.filter-left b {
-  font-size: 1rem;
-}
-
-.filter-left > .filter-type {
-  display: flex;
-  gap: 20px;
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 80%;
-  
-}
-
-.filter-type > div:hover {
-  color: #aa88e1;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
-.question-bank-search input{
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.9rem;
+.icon-placeholder:hover {
+  background: #ff7bb8;
+  color: white;
 }
 
-.type-filter.active-type  {
-  /* background-color: #e8def8; */
-  color: #6750a4 ;
-  text-decoration: underline;
+/* Bottom Copyright Bar */
+.footer-bottom {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 20px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #9ca3af;
 }

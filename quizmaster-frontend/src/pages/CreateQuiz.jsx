@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Outlet } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import './CreateQuiz.css';
 import './AutoGenerate.css';
@@ -40,28 +40,54 @@ const QUESTION_TYPES = {
     }
 };
 
+// Categories from quiz taking feature
+const CATEGORIES = [
+    { id: "data-structures", title: "Data Structures" },
+    { id: "maths", title: "Maths" },
+    { id: "programming", title: "Programming" },
+    { id: "oop", title: "Object Oriented Programming" },
+    { id: "web", title: "Web Development" },
+    { id: "dbms", title: "Database Management" },
+    { id: "networking", title: "Networking" },
+    { id: "python", title: "Python" },
+    { id: "java", title: "Java" }
+];
+
+// Subcategories/Topics per category
+const SUBCATEGORIES = {
+    "data-structures": ["Arrays", "Linked Lists", "Trees", "Graphs", "Hash Tables"],
+    "maths": ["Algebra", "Calculus", "Statistics", "Geometry", "Probability"],
+    "programming": ["Basics", "Control Flow", "Functions", "Data Types", "Algorithms"],
+    "oop": ["Classes", "Inheritance", "Polymorphism", "Encapsulation", "Abstraction"],
+    "web": ["HTML & CSS", "JavaScript", "React", "Node.js", "APIs"],
+    "dbms": ["SQL Basics", "Joins", "Indexes", "Normalization", "Transactions"],
+    "networking": ["OSI Model", "IP Addressing", "Routing", "Protocols", "Security"],
+    "python": ["Syntax", "Data Types", "Libraries", "OOP in Python", "File Handling"],
+    "java": ["Syntax", "OOP in Java", "Collections", "Exception Handling", "Multithreading"]
+};
+
 export default function CreateQuiz() {
     const { user } = useAuth();
-    const navigate = useNavigate();
+    // const navigate = useNavigate(); // Not currently used
     const [creationType, setCreationType] = useState(null);
     const [quizData, setQuizData] = useState({
         title: '',
         description: '',
+        category: '', // For quiz taking feature
+        subject: '', // Human-readable subject name
+        subcategory: '', // Topic/subtopic within category
         quizType: '',
         difficulty: {
             easy: false,
             medium: false,
             hard: false
         },
-        tags: [],
         timeLimit: 7,
         allowedAttempts: 5,
         shuffle: false,
         questions: [],
         status: ''
     });
-    const [newTag, setNewTag] = useState('');
-    const [showTagInput, setShowTagInput] = useState(false);
 
     const handleManualCreation = () => {
         setCreationType('manual');
@@ -86,31 +112,10 @@ export default function CreateQuiz() {
         setQuizData(prev => ({
             ...prev,
             difficulty: {
-                ...prev.difficulty,
-                [level]: !prev.difficulty[level]
+                easy: level === 'easy',
+                medium: level === 'medium',
+                hard: level === 'hard'
             }
-        }));
-    };
-
-    const handleAddTag = () => {
-        if (!showTagInput) {
-            setShowTagInput(true);
-            return;
-        }
-        if (newTag.trim() && !quizData.tags.includes(newTag.trim())) {
-            setQuizData(prev => ({
-                ...prev,
-                tags: [...prev.tags, newTag.trim()]
-            }));
-            setNewTag('');
-        }
-        setShowTagInput(false);
-    };
-
-    const handleRemoveTag = (tagToRemove) => {
-        setQuizData(prev => ({
-            ...prev,
-            tags: prev.tags.filter(tag => tag !== tagToRemove)
         }));
     };
 
@@ -247,6 +252,54 @@ export default function CreateQuiz() {
                     />
                 </div>
                 <div className="form-group">
+                    <label>Category</label>
+                    <select 
+                        value={quizData.category}
+                        onChange={(e) => {
+                            const selectedCategory = CATEGORIES.find(c => c.id === e.target.value);
+                            setQuizData(prev => ({
+                                ...prev,
+                                category: e.target.value,
+                                subject: selectedCategory ? selectedCategory.title : '',
+                                subcategory: '' // Reset subcategory when category changes
+                            }));
+                        }}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: '5px',
+                            border: '1px solid #ccc',
+                            fontSize: '14px'
+                        }}
+                    >
+                        <option value="">Select a category</option>
+                        {CATEGORIES.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.title}</option>
+                        ))}
+                    </select>
+                </div>
+                {quizData.category && SUBCATEGORIES[quizData.category] && (
+                    <div className="form-group">
+                        <label>Topic/Subcategory</label>
+                        <select 
+                            value={quizData.subcategory}
+                            onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                borderRadius: '5px',
+                                border: '1px solid #ccc',
+                                fontSize: '14px'
+                            }}
+                        >
+                            <option value="">Select a topic *</option>
+                            {SUBCATEGORIES[quizData.category].map(topic => (
+                                <option key={topic} value={topic}>{topic}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+                <div className="form-group">
                     <label>Quiz Type</label>
                     <div className="quiz-type-options">
                         <label>
@@ -276,50 +329,32 @@ export default function CreateQuiz() {
                     <div className="difficulty-options">
                         <label>
                             <input 
-                                type="checkbox"
+                                type="radio"
+                                name="difficulty"
+                                value="easy"
                                 checked={quizData.difficulty.easy}
                                 onChange={() => handleDifficultyChange('easy')}
                             /> Easy
                         </label>
                         <label>
                             <input 
-                                type="checkbox"
+                                type="radio"
+                                name="difficulty"
+                                value="medium"
                                 checked={quizData.difficulty.medium}
                                 onChange={() => handleDifficultyChange('medium')}
                             /> Medium
                         </label>
                         <label>
                             <input 
-                                type="checkbox"
+                                type="radio"
+                                name="difficulty"
+                                value="hard"
                                 checked={quizData.difficulty.hard}
                                 onChange={() => handleDifficultyChange('hard')}
                             /> Hard
                         </label>
                     </div>
-                </div>
-                <div className="form-group">
-                    <label>Tags</label>
-                    <div className="tags-container">
-                        {quizData.tags.map((tag, index) => (
-                            <span key={index} className="tag">
-                                {tag}
-                                <button onClick={() => handleRemoveTag(tag)}>&times;</button>
-                            </span>
-                        ))}
-                    </div>
-                    {showTagInput ? (
-                        <div className="tag-input-container">
-                            <input
-                                type="text"
-                                value={newTag}
-                                onChange={(e) => setNewTag(e.target.value)}
-                                placeholder="Enter tag"
-                            />
-                            <button onClick={handleAddTag}>Add</button>
-                        </div>
-                    ) : (
-                        <button className="add-tag-btn" onClick={handleAddTag}>+ Add Tag</button>
-                    )}
                 </div>
                 <div className="form-group">
                     <label>Time Limit</label>
@@ -484,6 +519,8 @@ export default function CreateQuiz() {
             id: q.id,
             type: q.type,
             question: q.question,
+            questionText: q.question,  // For QuestionViewer compatibility
+            text: q.question,          // Alternative fallback field
             addToBank: !!q.addToBank
         };
 
@@ -501,36 +538,55 @@ export default function CreateQuiz() {
         return stored;
     };
 
-    const handleSaveDraft = () => {
+    const handleSaveDraft = async () => {
         if (!user) {
             alert('Please sign in to save drafts in your account.');
             return;
         }
 
-        const payload = {
-            title: quizData.title,
-            description: quizData.description,
-            quizType: quizData.quizType,
-            difficulty: quizData.difficulty,
-            tags: quizData.tags,
-            timeLimit: quizData.timeLimit,
-            allowedAttempts: quizData.allowedAttempts,
-            shuffle: quizData.shuffle,
-            questions: quizData.questions.map(normalizeQuestionForStorage),
-            updatedAt: new Date().toISOString(),
-            status: 'draft'
-        };
+        // Validate category and subcategory selection
+        if (!quizData.category) {
+            alert('Please select a main category before saving.');
+            return;
+        }
+        if (!quizData.subcategory) {
+            alert('Please select a topic/subcategory before saving.');
+            return;
+        }
+
+        // Validate that there are questions
+        if (!quizData.questions || quizData.questions.length === 0) {
+            alert('Please add at least one question before saving to Question Bank.');
+            return;
+        }
 
         try {
-            const key = `quizmaster_drafts_${user.uid}`;
-            const raw = localStorage.getItem(key);
-            const drafts = raw ? JSON.parse(raw) : [];
-            drafts.push(payload);
-            localStorage.setItem(key, JSON.stringify(drafts));
-            alert('Draft saved locally for your account.');
-        } catch (err) {
-            console.error('Saving draft failed', err);
-            alert('Failed to save draft locally.');
+            // Save each question individually to questionBank collection
+            const questionBankCol = collection(db, 'questionBank');
+            const promises = [];
+            
+            quizData.questions.forEach((q) => {
+                const questionDoc = {
+                    ...normalizeQuestionForStorage(q),
+                    category: quizData.category,
+                    subject: quizData.subject,
+                    subcategory: quizData.subcategory,
+                    quizTitle: quizData.title || 'Untitled Quiz',
+                    difficulty: quizData.difficulty,
+                    createdBy: user.uid,
+                    createdAt: serverTimestamp(),
+                    status: 'draft'
+                };
+                promises.push(addDoc(questionBankCol, questionDoc));
+            });
+            
+            await Promise.all(promises);
+            alert(`${quizData.questions.length} question(s) saved to Question Bank! You can continue adding more questions.`);
+            
+            // DO NOT reset form - user can continue adding questions
+        } catch (error) {
+            console.error('Error saving draft:', error);
+            alert('Failed to save draft. Please try again.');
         }
     };
 
@@ -545,6 +601,14 @@ export default function CreateQuiz() {
             alert('Please provide a title for the quiz before publishing.');
             return;
         }
+        if (!quizData.category) {
+            alert('Please select a main category before publishing.');
+            return;
+        }
+        if (!quizData.subcategory) {
+            alert('Please select a topic/subcategory before publishing.');
+            return;
+        }
         if (!quizData.questions || quizData.questions.length === 0) {
             alert('Please add at least one question before publishing.');
             return;
@@ -556,28 +620,35 @@ export default function CreateQuiz() {
             quizData.difficulty.hard;
 
         if (!difficultySelected) {
-            alert('Please select one difficulty level');
+            alert('Please select a difficulty level');
             return;
         }
 
         const payload = {
             title: quizData.title,
             description: quizData.description,
+            category: quizData.category,     // For quiz taking feature
+            subject: quizData.subject,       // Human-readable name
+            subcategory: quizData.subcategory || '', // Topic/subtopic
             quizType: quizData.quizType,
             difficulty: quizData.difficulty,
-            tags: quizData.tags,
             timeLimit: quizData.timeLimit,
             allowedAttempts: quizData.allowedAttempts,
             shuffle: quizData.shuffle,
             questions: quizData.questions.map(normalizeQuestionForStorage),
             ownerId: user.uid,
             createdAt: serverTimestamp(),
-            status: 'published'
+            status: 'published',
+            published: true                  // For api.js compatibility
         };
 
         try {
             const quizzesCol = collection(db, 'quizzes');
+            console.log("📤 Publishing quiz with payload:", payload);
             const quizRef = await addDoc(quizzesCol, payload);
+            console.log("✅ Quiz published successfully with ID:", quizRef.id);
+            console.log("📋 Quiz details - Category:", payload.category, "Subject:", payload.subject, "Status:", payload.status);
+            
             // Save questions to questionBank if requested
             const questionBankCol = collection(db, 'questionBank');
             const promises = [];
@@ -595,11 +666,14 @@ export default function CreateQuiz() {
                 }
             });
             await Promise.all(promises);
-            alert('Quiz published successfully.');  // SUBJECT TO REMOVAL -- Not sure if this looks nice. Maybe display a simple tab with a nicer look?
-            // Optionally clear form
+            alert('Quiz published successfully and is now available for students to take!');
+            // Clear form
             setQuizData({
                 title: '',
                 description: '',
+                category: '',
+                subject: '',
+                subcategory: '',
                 quizType: '',
                 difficulty: { easy: false, medium: false, hard: false },
                 tags: [],
@@ -635,6 +709,7 @@ export default function CreateQuiz() {
         }));
     };
 
+    // eslint-disable-next-line no-unused-vars
     const handleTypeToggle = (type) => {
         setAutoGenState(prev => ({
             ...prev,
@@ -731,6 +806,56 @@ export default function CreateQuiz() {
                                 onChange={(e) => handleAutoGenInputChange('quizTitle', e.target.value)}
                             />
                         </div>
+
+                        <div className="form-group">
+                            <label>Category</label>
+                            <select 
+                                value={quizData.category}
+                                onChange={(e) => {
+                                    const selectedCategory = CATEGORIES.find(c => c.id === e.target.value);
+                                    setQuizData(prev => ({
+                                        ...prev,
+                                        category: e.target.value,
+                                        subject: selectedCategory ? selectedCategory.title : '',
+                                        subcategory: '' // Reset subcategory when category changes
+                                    }));
+                                }}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    borderRadius: '5px',
+                                    border: '1px solid #ccc',
+                                    fontSize: '14px'
+                                }}
+                            >
+                                <option value="">Select a category</option>
+                                {CATEGORIES.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.title}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {quizData.category && SUBCATEGORIES[quizData.category] && (
+                            <div className="form-group">
+                                <label>Topic/Subcategory *</label>
+                                <select 
+                                    value={quizData.subcategory}
+                                    onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px',
+                                        borderRadius: '5px',
+                                        border: '1px solid #ccc',
+                                        fontSize: '14px'
+                                    }}
+                                >
+                                    <option value="">Select a topic *</option>
+                                    {SUBCATEGORIES[quizData.category].map(topic => (
+                                        <option key={topic} value={topic}>{topic}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
                         <div className="input-paragraph">
                             <label>Input Paragraph</label>

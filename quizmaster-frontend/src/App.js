@@ -1,7 +1,8 @@
-// src/App.js
+// import "src/App.js";
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "../src/components/Navbar";
+import Footer from "../src/components/Footer";
 import ProtectedRoute from "../src/components/ProtectedRoute";
 
 
@@ -11,18 +12,21 @@ import Signup from "../src/pages/Signup";
 import ForgotPassword from "../src/pages/ForgotPassword";
 import CreateQuiz from "../src/pages/CreateQuiz";
 import QuestionBank from "../src/pages/QuestionBank";
-
 import Dashboard from "../src/pages/Dashboard";
-
 import QuizSelection from "../src/pages/QuizSelection";
+import QuizIntro from "../src/pages/QuizIntro"; 
 import QuestionViewer from "../src/pages/QuestionViewer";
 import ResultPage from "../src/pages/ResultPage";
+import GradeQuiz from "../src/pages/GradeQuiz";
+import QuizFeedback from "../src/pages/QuizFeedback";
 
 export default function App() {
   return (
-    <>
+    <div class="app-layout">
       <Navbar />
-      <Routes>
+        
+      <div className="main-content">
+        <Routes>
         <Route
           path="/"
           element={
@@ -60,12 +64,23 @@ export default function App() {
           }
         />
 
+        <Route path="/grade" element={<ProtectedRoute requireRole="educator"><GradeQuiz/></ProtectedRoute>} />
+        <Route path="/grade/feedback" element={<ProtectedRoute requireRole="educator"><QuizFeedback/></ProtectedRoute>} />
+
         {/* NEW quiz-taking flow */}
         <Route
           path="/quizzes"
           element={
             <ProtectedRoute>
               <QuizSelection />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quiz/:id/intro"
+          element={
+            <ProtectedRoute>
+              <QuizIntro />
             </ProtectedRoute>
           }
         />
@@ -88,7 +103,11 @@ export default function App() {
 
         {/* Redirect old link */}
         <Route path="/take-quiz" element={<Navigate to="/quizzes" replace />} />
+
       </Routes>
-    </>
+
+      </div>
+        <Footer/>
+    </div>
   );
 }

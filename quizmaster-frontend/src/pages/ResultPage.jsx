@@ -1,3 +1,4 @@
+// src/pages/ResultPage.jsx
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function ResultPage() {
@@ -99,7 +100,8 @@ export default function ResultPage() {
               }}
               onClick={(e) => {
                 e.preventDefault();
-                // hook this to grading page later
+                // 🔗 Go to the student's results page
+                nav("/my-results");
               }}
             >
               here

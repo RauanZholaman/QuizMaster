@@ -70,6 +70,7 @@ export default function CreateQuiz() {
     const { user } = useAuth();
     // const navigate = useNavigate(); // Not currently used
     const [creationType, setCreationType] = useState(null);
+    const [isPublishing, setIsPublishing] = useState(false);
     const [quizData, setQuizData] = useState({
         title: '',
         description: '',
@@ -591,6 +592,11 @@ export default function CreateQuiz() {
     };
 
     const handlePublish = async () => {
+        if (isPublishing) {
+            alert('Publishing in progress... Please wait.');
+            return;
+        }
+
         if (!user) {
             alert('Please sign in to publish quizzes.');
             return;
@@ -643,6 +649,7 @@ export default function CreateQuiz() {
         };
 
         try {
+            setIsPublishing(true);
             const quizzesCol = collection(db, 'quizzes');
             console.log("📤 Publishing quiz with payload:", payload);
             const quizRef = await addDoc(quizzesCol, payload);
@@ -684,9 +691,11 @@ export default function CreateQuiz() {
                 status: ''
             });
             setCreationType(null);
+            setIsPublishing(false);
         } catch (err) {
             console.error('Publish failed', err);
             alert('Failed to publish quiz. See console for details.');
+            setIsPublishing(false);
         }
     };
 

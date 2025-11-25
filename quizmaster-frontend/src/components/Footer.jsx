@@ -6,7 +6,7 @@ const teamMembers = [
     { name: 'Rauan', link: 'https://www.linkedin.com/in/rauan-zholaman/' },
     { name: 'Jian Xin', link: 'https://www.linkedin.com/in/jian-xin-png-8790a6163/' },
     { name: 'Chan',  link: 'https://www.linkedin.com/in/chan-myae-thinzar-tun-2249a2364/' },
-    { name: 'Thin',  link: '#' },
+    { name: 'Thin',  link: 'https://www.linkedin.com/in/thin-thet-htar-san-1b5152365/' },
     { name: 'May',   link: 'https://www.linkedin.com/in/may-thu-kyaing-838664364/' },
   ];
 
@@ -37,12 +37,6 @@ export default function Footer() {
                             {member.name}
                         </a>
                     ))}
-                    {/* <span>Ansar</span>
-                    <span>Rauan</span>
-                    <span>Jx</span>
-                    <span>Chan</span>
-                    <span>Thin</span>
-                    <span>May</span> */}
                 </div>
             </div>
 

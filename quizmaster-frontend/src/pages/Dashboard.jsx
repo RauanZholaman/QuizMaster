@@ -81,7 +81,10 @@ export default function Dashboard() {
             </div>
 
             {loading ? (
-                <div style={{ textAlign: "center", padding: 40 }}>Loading quizzes...</div>
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                    <p>Loading quizzes...</p>
+                </div>
             ) : sortedQuizzes.length === 0 ? (
                 <div style={{ textAlign: "center", padding: 40, background: "#f5f5f5", borderRadius: 12 }}>
                     <h3>No quizzes found</h3>

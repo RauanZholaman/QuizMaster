@@ -663,6 +663,9 @@ export default function CreateQuiz() {
                 if (q.addToBank) {
                     const qb = normalizeQuestionForStorage(q);
                     // include reference to published quiz id for traceability
+                    qb.category = quizData.category;     
+                    qb.subject = quizData.subject;          
+                    qb.subcategory = quizData.subcategory;
                     qb.quizId = quizRef.id;
                     qb.ownerId = user.uid;
                     qb.createdAt = serverTimestamp();

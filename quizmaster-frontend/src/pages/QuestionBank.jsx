@@ -1,14 +1,15 @@
-import { LuFilter, LuChevronLeft, LuChevronRight } from 'react-icons/lu'; // Added Chevron icons
+import { LuFilter, LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 import { FiEdit2 } from 'react-icons/fi';
-import { AiOutlineSave } from 'react-icons/ai';
-import { AiOutlineDelete } from 'react-icons/ai';
+import { AiOutlineSave, AiFillSave, AiOutlineDelete } from 'react-icons/ai'; // Added AiFillSave
 
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { useDebounce } from "use-debounce";
 import EditQuestionModal from "../pages/EditQuestionModal.jsx";
+import SubjectSelectionModal from '../pages/SubjectSelectionModal.jsx';
+import CreateQuizFromSelectionModal from '../pages/CreateQuizFromSelectionModal.jsx';
 
 const QUESTIONS_COLLECTION = 'questionBank';
 
@@ -22,7 +23,6 @@ const getDifficultyLabel = (difficultyObject) => {
     return 'Unknown';
 };
 
-
 export default function QuestionBank() {
     const { role } = useAuth();
     const canEdit = role === 'educator';
@@ -31,14 +31,8 @@ export default function QuestionBank() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [stats, setStats] = useState({
-        total: 0,
-        published: 0,
-        drafts: 0,
-        categories: 0,
-        easy: 0,
-        medium: 0,
-        hard: 0,
-        type: 0
+        total: 0, published: 0, drafts: 0, categories: 0,
+        easy: 0, medium: 0, hard: 0, type: 0
     });
     
     // Filter & Search States
@@ -53,7 +47,41 @@ export default function QuestionBank() {
     
     // Question editing
     const [editingQuestion, setEditingQuestion] = useState(null);
-   
+
+    // Subject Filter Modal
+    const [showSubjectModal, setShowSubjectModal] = useState(false);
+    const [subjectFilter, setSubjectFilter] = useState(null); 
+
+    // favorites card
+    const [selectedIds, setSelectedIds] = useState(new Set()); 
+    const [showCreateQuizModal, setShowCreateQuizModal] = useState(false);
+    
+    // --- HANDLERS ---
+
+    const handleToggleSelect = (question) => {
+        const id = question.firestoreId; 
+        setSelectedIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) {
+                newSet.delete(id);
+            } else {
+                newSet.add(id);
+            }
+            return newSet;
+        });
+    };
+
+    const getSelectedObjects = () => {
+        return questions.filter(q => selectedIds.has(q.firestoreId));
+    };
+
+    const handleQuizCreated = () => {
+        alert("Quiz Created Successfully!");
+        setSelectedIds(new Set()); 
+        setShowCreateQuizModal(false);
+    };
+
+    // --- FETCH DATA ---
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
@@ -78,7 +106,9 @@ export default function QuestionBank() {
                         if (data.difficulty.hard) newStats.hard++;
                     }
 
-                    if (data.categories) newStats.categories.add(data.categories);
+                    // Count categories/subjects
+                    if (data.subject) newStats.categories.add(data.subject);
+                    else if (data.category) newStats.categories.add(data.category);
                     
                     return { firestoreId: doc.id, ...doc.data() };
                 });
@@ -98,18 +128,23 @@ export default function QuestionBank() {
 
         fetchQuestions();
     }, []);
-
+    
     // Reset page to 1 whenever filters or search change
     useEffect(() => {
         setCurrentPage(1);
-    }, [activeFilter, typeFilter, debouncedSearch]);
+    }, [activeFilter, typeFilter, debouncedSearch, subjectFilter]);
 
     const handleDelete = async (questionFirestoreId) => {
-        if (!canEdit) return; // Safety: students cannot delete
+        if (!canEdit) return; 
         try {
             const docRef = doc(db, QUESTIONS_COLLECTION, questionFirestoreId);
             await deleteDoc(docRef);
             setQuestionsData(prevQuestions => prevQuestions.filter(q => q.firestoreId !== questionFirestoreId));
+            
+            // Remove from selection if deleted
+            if(selectedIds.has(questionFirestoreId)) {
+                handleToggleSelect({firestoreId: questionFirestoreId});
+            }
         } catch (error) {
             console.error("Error deleting document: ", error);
         }
@@ -118,17 +153,30 @@ export default function QuestionBank() {
     const getFilteredQuestions = () => {
         let result = questions;
 
-        // Apply existing Logic
-        if (activeFilter.includes('All Questions')) {
-            // If "All Questions", we usually return everything
-            return questions;
+        // 1. Apply Subject Filter
+        if (subjectFilter) {
+            result = result.filter(q => {
+                let qSubjectName = q.subject;
+                if (!qSubjectName && q.category) {
+                    qSubjectName = q.category.charAt(0).toUpperCase() + q.category.slice(1);
+                }
+                const matchSubject = qSubjectName === subjectFilter.subject;
+                const matchSub = subjectFilter.subcategory ? q.subcategory === subjectFilter.subcategory : true;
+                return matchSubject && matchSub;
+            });
         }
 
+        // 2. Apply Type Filter
         if (typeFilter.length > 0) {
-            return result = result.filter(q => typeFilter.includes(q.type));
+            result = result.filter(q => typeFilter.includes(q.type));
         }
 
-        return questions.filter(q => {
+        // 3. Apply Grid Filters
+        if (activeFilter.includes('All Questions')) {
+            return result; 
+        }
+
+        return result.filter(q => {
             const matchesDifficulty = 
                 (activeFilter.includes('Easy') && q.difficulty.easy) ||
                 (activeFilter.includes('Medium') && q.difficulty.medium) ||
@@ -144,88 +192,67 @@ export default function QuestionBank() {
         });
     };
 
-    if (loading) return <div>Loading questions...</div>;
+    if (loading) return <div className='loading-questions'>Loading questions...</div>;
     if (error) return <div>{error}</div>;
 
-    // --- DATA PROCESSING FOR PAGINATION ---
-
-    // Get Base Filtered List
+    // --- PAGINATION & SEARCH ---
     const baseFilteredQuestions = getFilteredQuestions();
-
-    // Apply Search (Moved from JSX to here)
     const processedQuestions = baseFilteredQuestions.filter((q) => {
         return search.toLowerCase() === ''
             ? q
             : q.question.toLowerCase().includes(debouncedSearch.toLowerCase());
     });
 
-    // Calculate Pagination Indices
+    // Calculation for question bank table pagination.
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentQuestions = processedQuestions.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(processedQuestions.length / itemsPerPage);
 
-    // Pagination Handlers
-    const goToNextPage = () => {
-        if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
-    };
-    const goToPrevPage = () => {
-        if (currentPage > 1) setCurrentPage(prev => prev - 1);
-    };
+    const goToNextPage = () => { if (currentPage < totalPages) setCurrentPage(prev => prev + 1); };
+    const goToPrevPage = () => { if (currentPage > 1) setCurrentPage(prev => prev - 1); };
 
-    // --- QUESTION EDITING ---
+    // --- EDITING ---
+    const handleEditClick = (question) => setEditingQuestion(question);
 
-    // Triggered when Pencil icon is clicked
-    const handleEditClick = (question) => {
-        setEditingQuestion(question);
-    };
-
-    // Triggered when "Save" is clicked in Modal
     const handleUpdateQuestion = async (docId, updatedData) => {
-    // 1. Validation
-    if (!docId) {
-        console.error("❌ Error: docId is missing. Data:", updatedData);
-        alert("Cannot update: Missing Question ID");
-        return;
-    }
+        if (!docId) return alert("Cannot update: Missing Question ID");
+        try {
+            const docRef = doc(db, QUESTIONS_COLLECTION, docId);
+            await updateDoc(docRef, updatedData);
+            setQuestionsData(prev => prev.map(q => 
+                (q.firestoreId === docId || q.id === docId) ? { ...q, ...updatedData } : q
+            ));
+            setEditingQuestion(null);
+        } catch (error) {
+            console.error("Error updating: ", error);
+            alert(`Failed to update: ${error.message}`);
+        }
+    };
 
-    try {
-        console.log(`🔄 Updating document: ${docId}`);
-        const docRef = doc(db, QUESTIONS_COLLECTION, docId);
-        
-        // 2. Update Firestore
-        await updateDoc(docRef, updatedData);
-
-        // 3. Update Local State (UI)
-        setQuestionsData(prev => prev.map(q => 
-            // Check both potential ID names to be safe
-            (q.firestoreId === docId || q.id === docId) 
-                ? { ...q, ...updatedData } 
-                : q
-        ));
-
-        setEditingQuestion(null);
-        console.log("✅ Document successfully updated!");
-
-    } catch (error) {
-        console.error("❌ Error updating document: ", error);
-        alert(`Failed to update: ${error.message}`);
-    }
-};
-
-        return (
+    return (
         <div className="Question-Bank-Content">
-                        { !canEdit && (
-                            <div style={{background:'#fff3cd', border:'1px solid #ffe58f', padding:12, borderRadius:6, marginBottom:12}}>
-                                Read-only view: as a student you can browse questions but not edit or delete them.
-                            </div>
-                        ) }
-            <SelectionGrid stats={stats} activeFilter={activeFilter} onFilterChange={setActiveFilter}/>
+            {!canEdit && (
+                <div style={{background:'#fff3cd', border:'1px solid #ffe58f', padding:12, borderRadius:6, marginBottom:12}}>
+                    Read-only view: as a student you can browse questions but not edit or delete them.
+                </div>
+            )}
+            
+            <SelectionGrid 
+                stats={stats} 
+                activeFilter={activeFilter} 
+                onFilterChange={setActiveFilter}
+                onSubjectClick={() => setShowSubjectModal(true)}
+                activeSubject={subjectFilter}
+            />
+            
             <div>
-                <FilterBar search={search} 
-                           setSearch={setSearch} 
-                           typeFilter={typeFilter} 
-                           onTypeFilterChange={setTypeFilter} />
+                <FilterBar 
+                    search={search} 
+                    setSearch={setSearch} 
+                    typeFilter={typeFilter} 
+                    onTypeFilterChange={setTypeFilter} 
+                />
                 
                 <div className="Question-Bank-Table">
                     <div className="Question-Bank-Header">
@@ -237,29 +264,41 @@ export default function QuestionBank() {
 
                     <div className="Question-Bank-Body">
                         {currentQuestions.length > 0 ? (
-                            currentQuestions.map((q) => (
-                                <div key={q.firestoreId} className="Question-Bank-Row">
-                                    <div>{q.question}</div>
-                                    <div>{q.type}</div>
-                                    <div>{getDifficultyLabel(q.difficulty)}</div>
-                                    <div className="action-icons">
-                                        {canEdit ? (
-                                            <>
-                                                <span onClick={() => handleEditClick(q)} style={{cursor: 'pointer'}}>
-                                                    <FiEdit2/>
-                                                </span>
+                            currentQuestions.map((q) => {
+                                // Check selection state for this question
+                                const isSelected = selectedIds.has(q.firestoreId);
 
-                                                <span onClick={() => handleDelete(q.firestoreId)} style={{cursor:'pointer'}}>
-                                                    <AiOutlineDelete /> 
-                                                </span>
-                                                <AiOutlineSave/>
-                                            </>
-                                        ) : (
-                                            <span style={{opacity:0.5, fontSize:12}}>—</span>
-                                        )}
+                                return (
+                                    <div key={q.firestoreId} className={`Question-Bank-Row ${isSelected ? 'row-selected' : ''}`}>
+                                        <div>{q.question}</div>
+                                        <div>{q.type}</div>
+                                        <div>{getDifficultyLabel(q.difficulty)}</div>
+                                        <div className="action-icons">
+                                            {canEdit ? (
+                                                <>
+                                                    <span onClick={() => handleEditClick(q)} style={{cursor: 'pointer'}}>
+                                                        <FiEdit2/>
+                                                    </span>
+                                                    <span onClick={() => handleDelete(q.firestoreId)} style={{cursor:'pointer'}}>
+                                                        <AiOutlineDelete /> 
+                                                    </span>
+                                                    {/* Toggle Button */}
+                                                    <span 
+                                                        onClick={() => handleToggleSelect(q)} 
+                                                        className={isSelected ? 'icon-active' : ''}
+                                                        style={{cursor: 'pointer'}}
+                                                        title={isSelected ? "Remove from Quiz Cart" : "Add to Quiz Cart"}
+                                                    >
+                                                        {isSelected ? <AiFillSave /> : <AiOutlineSave />}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span style={{opacity:0.5, fontSize:12}}>—</span>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         ) : (
                             <div style={{padding: '20px', textAlign: 'center', color: '#888'}}>
                                 No questions found.
@@ -275,29 +314,47 @@ export default function QuestionBank() {
                             </span>
                             
                             <div className="pagination-controls">
-                                <button 
-                                    onClick={goToPrevPage} 
-                                    disabled={currentPage === 1}
-                                    className="pagination-btn"
-                                >
+                                <button onClick={goToPrevPage} disabled={currentPage === 1} className="pagination-btn">
                                     <LuChevronLeft /> Prev
                                 </button>
-                                
                                 <span style={{fontSize: '0.9rem', fontWeight: '500'}}>
                                     Page {currentPage} of {totalPages}
                                 </span>
-
-                                <button 
-                                    onClick={goToNextPage} 
-                                    disabled={currentPage === totalPages}
-                                    className="pagination-btn"
-                                >
+                                <button onClick={goToNextPage} disabled={currentPage === totalPages} className="pagination-btn">
                                     Next <LuChevronRight />
                                 </button>
                             </div>
                         </div>
                     )}
                 </div>
+
+                {/* --- FLOATING CART BAR --- */}
+                {selectedIds.size > 0 && (
+                    <div className="cart-bar">
+                        <div className="cart-info">
+                            <span className="cart-count">{selectedIds.size}</span>
+                            <span>questions selected</span>
+                        </div>
+                        <div className="cart-actions">
+                            <button className="btn-clear" onClick={() => setSelectedIds(new Set())}>
+                                Clear
+                            </button>
+                            <button className="btn-create" onClick={() => setShowCreateQuizModal(true)}>
+                                Create Quiz
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* --- MODALS --- */}
+                {showSubjectModal && (
+                    <SubjectSelectionModal 
+                        questions={questions}
+                        currentFilter={subjectFilter}
+                        onClose={() => setShowSubjectModal(false)}
+                        onApply={setSubjectFilter}
+                    />
+                )}
 
                 {editingQuestion && (
                     <EditQuestionModal 
@@ -306,13 +363,22 @@ export default function QuestionBank() {
                         onSave={handleUpdateQuestion}
                     />
                 )}
+
+                {showCreateQuizModal && (
+                    <CreateQuizFromSelectionModal 
+                        selectedQuestions={getSelectedObjects()}
+                        onClose={() => setShowCreateQuizModal(false)}
+                        onSuccess={handleQuizCreated}
+                    />
+                )}
             </div>
         </div>
     );
 }
 
+// --- SUB-COMPONENTS ---
 
-function SelectionGrid({stats, activeFilter, onFilterChange}) {
+function SelectionGrid({stats, activeFilter, onFilterChange, onSubjectClick, activeSubject}) {
     const handleBoxClick = (filterName) => {
         if (activeFilter.includes(filterName)) {
             onFilterChange(activeFilter.filter(f => f !== filterName));
@@ -320,7 +386,6 @@ function SelectionGrid({stats, activeFilter, onFilterChange}) {
             onFilterChange([...activeFilter, filterName]);
         }
     };
-
     const isActive = (filterName) => activeFilter.includes(filterName) ? 'active-box' : '';
 
     return (
@@ -337,9 +402,13 @@ function SelectionGrid({stats, activeFilter, onFilterChange}) {
                 <div className="box-top">{stats.drafts}</div>
                 <div className="box-bottom">Drafts</div>
             </div>
-            <div className="box-select">
+            <div onClick={onSubjectClick} className={`box-select ${activeSubject ? 'active-box' : ''}`}>
                 <div className="box-top">{stats.categories}</div>
-                <div className="box-bottom">Categories</div>
+                <div className="box-bottom">
+                    {activeSubject ? (
+                         <span style={{fontSize: '0.8em'}}>{activeSubject.subcategory || activeSubject.subject}</span>
+                    ) : "Subjects"}
+                </div>
             </div>
             <div onClick={() => handleBoxClick('Easy')} className={`box-select ${isActive('Easy')}`}>
                 <div className="box-top">{stats.easy}</div>

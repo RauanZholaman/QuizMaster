@@ -9,46 +9,84 @@ export default function Dashboard() {
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sortOrder, setSortOrder] = useState('newest');
+    const [filterHasSubmissions, setFilterHasSubmissions] = useState(false);
 
     useEffect(() => {
-        const fetchQuizzes = async () => {
+        const fetchData = async () => {
             try {
+                // Fetch Quizzes
                 const quizzesRef = collection(db, 'quizzes');
-                // Try to order by createdAt if index exists, else just fetch
-                // const q = query(quizzesRef, orderBy('createdAt', 'desc'));
-                const snapshot = await getDocs(quizzesRef);
-                
-                const quizList = snapshot.docs.map(doc => ({
+                const quizzesSnap = await getDocs(quizzesRef);
+                const quizList = quizzesSnap.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
+
+                // Fetch Submissions to calculate stats
+                const submissionsRef = collection(db, 'submissions');
+                const submissionsSnap = await getDocs(submissionsRef);
                 
-                setQuizzes(quizList);
+                const submissionMap = {}; // quizId -> { count, lastAt }
+                
+                submissionsSnap.forEach(doc => {
+                    const data = doc.data();
+                    const qId = data.quizId;
+                    if (!qId) return;
+                    
+                    if (!submissionMap[qId]) {
+                        submissionMap[qId] = { count: 0, lastAt: null };
+                    }
+                    
+                    submissionMap[qId].count++;
+                    const subDate = data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt || 0);
+                    
+                    if (!submissionMap[qId].lastAt || subDate > submissionMap[qId].lastAt) {
+                        submissionMap[qId].lastAt = subDate;
+                    }
+                });
+
+                // Merge stats into quizzes
+                const quizzesWithStats = quizList.map(q => ({
+                    ...q,
+                    submissionCount: submissionMap[q.id]?.count || 0,
+                    lastSubmissionAt: submissionMap[q.id]?.lastAt || null
+                }));
+                
+                setQuizzes(quizzesWithStats);
             } catch (error) {
-                console.error("Error fetching quizzes:", error);
+                console.error("Error fetching data:", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchQuizzes();
+        fetchData();
     }, []);
 
     const formatDate = (timestamp) => {
         if (!timestamp) return 'N/A';
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        return date.toLocaleDateString();
+        return date.toLocaleDateString('en-GB'); // DD/MM/YYYY
     };
 
-    const sortedQuizzes = [...quizzes].sort((a, b) => {
-        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
-        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-        return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-    });
+    const sortedQuizzes = [...quizzes]
+        .filter(q => !filterHasSubmissions || q.submissionCount > 0)
+        .sort((a, b) => {
+            if (sortOrder === 'submissionNewest') {
+                return (b.lastSubmissionAt || 0) - (a.lastSubmissionAt || 0);
+            }
+            if (sortOrder === 'submissionOldest') {
+                return (a.lastSubmissionAt || 0) - (b.lastSubmissionAt || 0);
+            }
+            
+            const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+            const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+            return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+        });
 
     return (
         <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px" }}>
-            <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
                 <div>
                     <h1 style={{ fontSize: 32, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>
                         Educator Dashboard
@@ -58,26 +96,42 @@ export default function Dashboard() {
                     </p>
                 </div>
                 
-                <button
-                    onClick={() => setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        padding: '8px 16px',
-                        borderRadius: 20,
-                        border: '1px solid #e5e7eb',
-                        background: 'white',
-                        cursor: 'pointer',
-                        fontSize: 14,
-                        fontWeight: 500,
-                        color: '#374151',
-                        height: 'fit-content'
-                    }}
-                >
-                    <ArrowUpDown size={16} />
-                    {sortOrder === 'newest' ? 'Newest First' : 'Oldest First'}
-                </button>
+                <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: '#374151' }}>
+                        <input 
+                            type="checkbox" 
+                            checked={filterHasSubmissions} 
+                            onChange={(e) => setFilterHasSubmissions(e.target.checked)}
+                            style={{ width: 16, height: 16, accentColor: '#7c3aed' }}
+                        />
+                        Has Submissions
+                    </label>
+
+                    <div style={{ position: 'relative' }}>
+                        <select
+                            value={sortOrder}
+                            onChange={(e) => setSortOrder(e.target.value)}
+                            style={{
+                                appearance: 'none',
+                                padding: '8px 36px 8px 16px',
+                                borderRadius: 20,
+                                border: '1px solid #e5e7eb',
+                                background: 'white',
+                                cursor: 'pointer',
+                                fontSize: 14,
+                                fontWeight: 500,
+                                color: '#374151',
+                                height: 40
+                            }}
+                        >
+                            <option value="newest">Newest Created</option>
+                            <option value="oldest">Oldest Created</option>
+                            <option value="submissionNewest">Latest Submission</option>
+                            <option value="submissionOldest">Oldest Submission</option>
+                        </select>
+                        <ArrowUpDown size={16} style={{ position: 'absolute', right: 12, top: 12, pointerEvents: 'none', color: '#6b7280' }} />
+                    </div>
+                </div>
             </div>
 
             {loading ? (
@@ -132,6 +186,10 @@ export default function Dashboard() {
                                     </span>
                                     <span>
                                         {quiz.subject || quiz.category || "General"}
+                                    </span>
+                                    <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                        <BarChart3 size={16} />
+                                        {quiz.submissionCount} Submissions
                                     </span>
                                     <span style={{ 
                                         background: quiz.status === 'published' ? '#dcfce7' : '#f3f4f6',

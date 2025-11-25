@@ -78,9 +78,12 @@ export default function QuestionViewer() {
       ? Math.round((Date.now() - startAt.current) / 1000)
       : 0;
 
-    const answeredCount = Object.values(answers).filter(
-      (v) => v !== "" && v != null
-    ).length;
+    const answeredCount = Object.values(answers).filter((v) => {
+      if (v == null) return false;
+      if (typeof v === "string") return v.trim() !== "";
+      if (Array.isArray(v)) return v.length > 0;
+      return true;
+    }).length;
 
     // Save submission to Firestore
     try {
@@ -89,18 +92,23 @@ export default function QuestionViewer() {
         await addDoc(collection(db, "submissions"), {
           quizId: quiz.id,
           studentId: user.uid,
-          studentName: profile ? `${profile.firstName} ${profile.lastName}` : (user.displayName || user.email),
+          studentName: profile
+            ? `${profile.firstName} ${profile.lastName}`
+            : user.displayName || user.email,
           studentEmail: user.email,
           answers: answers,
           submittedAt: serverTimestamp(),
           graded: false,
           score: null,
           timeTaken: elapsed,
-          autoSubmitted: auto
+          autoSubmitted: auto,
         });
         console.log("Submission saved successfully");
       } else {
-        console.warn("Cannot save submission: User or Quiz ID missing", { user, quizId: quiz?.id });
+        console.warn("Cannot save submission: User or Quiz ID missing", {
+          user,
+          quizId: quiz?.id,
+        });
       }
     } catch (error) {
       console.error("Error saving submission:", error);
@@ -137,10 +145,16 @@ export default function QuestionViewer() {
   const q = questions[idx] || {};
   const progressPct = total ? Math.round(((idx + 1) / total) * 100) : 0;
 
+  // Build set of attempted question IDs (all as strings)
   const attemptedIds = new Set(
     Object.entries(answers)
-      .filter(([, v]) => v !== "" && v != null)
-      .map(([k]) => k)
+      .filter(([, v]) => {
+        if (v == null) return false;
+        if (typeof v === "string") return v.trim() !== "";
+        if (Array.isArray(v)) return v.length > 0;
+        return true;
+      })
+      .map(([k]) => String(k))
   );
 
   // ---------- UI ----------
@@ -331,10 +345,10 @@ export default function QuestionViewer() {
                 {(q.options || q.choices || []).map((opt, i) => {
                   const value = typeof opt === "string" ? opt : String(opt);
                   const selectedAnswers = answers[q.id] || [];
-                  const checked = Array.isArray(selectedAnswers) 
+                  const checked = Array.isArray(selectedAnswers)
                     ? selectedAnswers.includes(value)
                     : false;
-                  
+
                   return (
                     <label
                       key={i}
@@ -364,7 +378,7 @@ export default function QuestionViewer() {
                           } else {
                             // Remove from array
                             newAnswers = Array.isArray(selectedAnswers)
-                              ? selectedAnswers.filter(v => v !== value)
+                              ? selectedAnswers.filter((v) => v !== value)
                               : [];
                           }
                           setAnswer(q, newAnswers);
@@ -576,10 +590,14 @@ export default function QuestionViewer() {
                 fontSize: "14px",
               }}
             >
-              {questions.map((_, i) => {
+              {questions.map((qItem, i) => {
                 const isCurrent = i === idx;
-                const isAttempted =
-                  questions[i] && attemptedIds.has(questions[i].id);
+
+                const qId =
+                  qItem && qItem.id != null ? String(qItem.id) : String(i);
+
+                const isAttempted = attemptedIds.has(qId);
+
                 return (
                   <button
                     key={i}

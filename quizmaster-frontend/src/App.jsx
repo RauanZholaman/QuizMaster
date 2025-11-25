@@ -17,6 +17,8 @@ import QuizFeedback from "./pages/QuizFeedback";
 import QuizSelection from "./pages/QuizSelection.jsx";
 import QuestionViewer from "./pages/QuestionViewer.jsx";
 import ResultPage from "./pages/ResultPage.jsx";
+import StudentResults from "./pages/StudentResults.jsx";
+
 
 export default function App() {
   return (
@@ -79,6 +81,13 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/student-results" element={
+            <ProtectedRoute requireRole="student">
+              <StudentResults />
+            </ProtectedRoute>
+          } 
+          />
+
 
           <Route path="/take-quiz" element={<Navigate to="/quizzes" replace />} />
 

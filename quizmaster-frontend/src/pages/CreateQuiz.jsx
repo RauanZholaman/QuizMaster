@@ -760,7 +760,7 @@ export default function CreateQuiz() {
             }));
         } catch (error) {
             console.error('Error generating questions:', error);
-            alert('Failed to generate questions. Please check your API key and try again.');
+            alert(`Failed to generate questions: ${error.message}`);
             setAutoGenState(prev => ({ ...prev, isGenerating: false }));
         }
     };

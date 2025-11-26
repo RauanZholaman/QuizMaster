@@ -21,6 +21,7 @@ export default function QuestionViewer() {
   const [remaining, setRemaining] = useState(undefined);
   const startAt = useRef(null);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ----- timer -----
   useEffect(() => {
@@ -101,6 +102,16 @@ export default function QuestionViewer() {
   }
 
   async function doSubmit(auto = false) {
+    // Prevent duplicate submissions
+    if (isSubmitting) {
+      if (!auto) {
+        alert("Submission in progress... Please wait.");
+      }
+      return;
+    }
+
+    setIsSubmitting(true);
+
     const elapsed = startAt.current
       ? Math.round((Date.now() - startAt.current) / 1000)
       : 0;
@@ -116,6 +127,8 @@ export default function QuestionViewer() {
     try {
       if (user && quiz?.id) {
         console.log("Saving submission for quiz:", quiz.id);
+        
+        // Save submission
         await addDoc(collection(db, "submissions"), {
           quizId: quiz.id,
           studentId: user.uid,
@@ -131,6 +144,15 @@ export default function QuestionViewer() {
           autoSubmitted: auto,
         });
         console.log("Submission saved successfully");
+
+        // Record attempt in quizAttempts collection
+        await addDoc(collection(db, "quizAttempts"), {
+          quizId: quiz.id,
+          userId: user.uid,
+          attemptedAt: serverTimestamp(),
+          timeTaken: elapsed,
+        });
+        console.log("Attempt recorded successfully");
       } else {
         console.warn("Cannot save submission: User or Quiz ID missing", {
           user,
@@ -139,8 +161,12 @@ export default function QuestionViewer() {
       }
     } catch (error) {
       console.error("Error saving submission:", error);
+      setIsSubmitting(false);
+      alert("Failed to submit quiz. Please try again.");
+      return;
     }
 
+    // Navigate to results page
     nav(`/result/${quiz?.id || quizId}`, {
       state: {
         title: quiz?.title,
@@ -540,19 +566,22 @@ export default function QuestionViewer() {
             ) : (
               <button
                 onClick={() => doSubmit(false)}
+                disabled={isSubmitting}
                 style={{
                   padding: "10px 32px",
                   borderRadius: "999px",
                   border: "none",
-                  background:
-                    "linear-gradient(90deg, rgba(34,197,94,1), rgba(59,130,246,1))",
+                  background: isSubmitting
+                    ? "#d1d5db"
+                    : "linear-gradient(90deg, rgba(34,197,94,1), rgba(59,130,246,1))",
                   color: "#ffffff",
-                  cursor: "pointer",
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
                   fontSize: "14px",
                   fontWeight: 600,
+                  opacity: isSubmitting ? 0.6 : 1,
                 }}
               >
-                Submit Quiz
+                {isSubmitting ? "Submitting..." : "Submit Quiz"}
               </button>
             )}
           </div>

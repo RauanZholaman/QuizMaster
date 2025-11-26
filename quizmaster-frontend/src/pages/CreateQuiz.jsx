@@ -847,7 +847,9 @@ export default function CreateQuiz() {
             {autoGenState.isGenerating && (
                 <div className="loading-overlay">
                     <div className="loading-content">
-                        <div className="spinner"></div>
+                        <div className="loading-bar-container">
+                            <div className="loading-bar-progress"></div>
+                        </div>
                         <h2>Generating Questions...</h2>
                     </div>
                 </div>

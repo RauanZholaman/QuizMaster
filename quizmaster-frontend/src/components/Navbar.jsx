@@ -78,19 +78,28 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="mobile-menu">
-          <Link to="/" className="mobile-nav-link" onClick={toggleMenu}>Home</Link>
-          {user && role === "educator" && (
-            <>
-              <Link to="/dashboard" className="mobile-nav-link" onClick={toggleMenu}>Dashboard</Link>
-              <Link to="/question-bank" className="mobile-nav-link" onClick={toggleMenu}>Question Bank</Link>
-              <Link to="/create-quiz" className="mobile-nav-link" onClick={toggleMenu}>Create Quiz</Link>
-            </>
-          )}
-          {user && role === "student" && (
-            <Link to="/take-quiz" className="mobile-nav-link" onClick={toggleMenu}>Take Quiz</Link>
-          )}
+      <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
+        <Link to="/" className="mobile-nav-link" onClick={toggleMenu}>Home</Link>
+        
+        {!user && (
+          <>
+            <Link to="/login" className="mobile-nav-link" onClick={toggleMenu}>Login</Link>
+            <Link to="/signup" className="mobile-nav-link" onClick={toggleMenu}>Signup</Link>
+          </>
+        )}
+
+        {user && role === "educator" && (
+          <>
+            <Link to="/dashboard" className="mobile-nav-link" onClick={toggleMenu}>Dashboard</Link>
+            <Link to="/question-bank" className="mobile-nav-link" onClick={toggleMenu}>Question Bank</Link>
+            <Link to="/create-quiz" className="mobile-nav-link" onClick={toggleMenu}>Create Quiz</Link>
+          </>
+        )}
+        {user && role === "student" && (
+          <Link to="/take-quiz" className="mobile-nav-link" onClick={toggleMenu}>Take Quiz</Link>
+        )}
+        
+        {user && (
           <div className="mobile-user-section">
             <div className="mobile-user-info">
               <span className="user-email">{user.email}</span>
@@ -101,8 +110,8 @@ export default function Navbar() {
               <span>Logout</span>
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 }

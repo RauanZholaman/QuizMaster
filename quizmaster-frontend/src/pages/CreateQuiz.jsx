@@ -973,7 +973,12 @@ export default function CreateQuiz() {
                                 onClick={generateQuestions}
                                 disabled={autoGenState.isGenerating || !autoGenState.inputText.trim()}
                             >
-                                {autoGenState.isGenerating ? 'Generating Questions...' : 'Generate Questions'}
+                                {autoGenState.isGenerating ? (
+                                    <>
+                                        <span className="loading-spinner"></span>
+                                        Generating Questions...
+                                    </>
+                                ) : 'Generate Questions'}
                             </button>
                         </div>
                     </>

@@ -1109,3 +1109,161 @@
     min-height: 70px;
   }
 }
+
+/* Quiz Submissions Page Styles */
+.submission-filters {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  max-width: 800px;
+  margin: 0 auto 32px;
+}
+
+.search-box {
+  background: #F3E8F5;
+  padding: 12px 24px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+}
+
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  border-radius: 30px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.submission-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+.submission-info {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex: 1;
+}
+
+.status-badge {
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.student-avatar {
+  background: #E8DEF8;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6750A4;
+  font-weight: 600;
+}
+
+.student-name {
+  font-weight: 600;
+  min-width: 150px;
+}
+
+.submission-actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.submission-date {
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-mark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #6750A4;
+  background: #E8DEF8;
+  color: #1D192B;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-feedback {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #79747E;
+  background: white;
+  color: #1D192B;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Mobile Optimization for Quiz Submissions */
+@media (max-width: 768px) {
+  .submission-filters {
+    flex-direction: column;
+  }
+
+  .submission-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .submission-info {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 12px;
+  }
+
+  .submission-actions-wrapper {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .action-buttons {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-mark, .btn-feedback {
+    justify-content: center;
+    width: 100%;
+  }
+}

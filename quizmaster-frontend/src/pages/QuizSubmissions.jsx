@@ -103,7 +103,7 @@ export default function QuizSubmissions() {
     };
 
     return (
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px', fontFamily: 'Inter, sans-serif' }}>
+        <div className="responsive-container">
             {/* Header */}
             <div style={{ marginBottom: 24 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
@@ -120,7 +120,7 @@ export default function QuizSubmissions() {
                     {quiz.title}
                 </h1>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #eee', paddingBottom: 16 }}>
+                <div className="responsive-header" style={{ borderBottom: '1px solid #eee', paddingBottom: 16 }}>
                     <div>
                         <h2 style={{ fontSize: 20, fontWeight: 600, margin: 0 }}>
                             {quiz.title}: {quiz.subject || 'General'}
@@ -133,34 +133,20 @@ export default function QuizSubmissions() {
             </div>
 
             {/* Search Bar & Sort */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 32, maxWidth: 800, margin: '0 auto 32px' }}>
-                <div style={{ background: '#F3E8F5', padding: '12px 24px', borderRadius: 30, display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+            <div className="submission-filters">
+                <div className="search-box">
                     <Search size={20} color="#666" />
                     <input 
                         type="text" 
                         placeholder="Search Student" 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: 16 }}
                     />
                 </div>
                 
                 <button
                     onClick={() => setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        padding: '0 24px',
-                        borderRadius: 30,
-                        border: '1px solid #e5e7eb',
-                        background: 'white',
-                        cursor: 'pointer',
-                        fontSize: 14,
-                        fontWeight: 500,
-                        color: '#374151',
-                        whiteSpace: 'nowrap'
-                    }}
+                    className="sort-btn"
                 >
                     <ArrowUpDown size={16} />
                     {sortOrder === 'newest' ? 'Newest First' : 'Oldest First'}
@@ -171,49 +157,28 @@ export default function QuizSubmissions() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {filteredSubmissions.length > 0 ? (
                     filteredSubmissions.map((sub, index) => (
-                        <div key={sub.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 32, flex: 1 }}>
-                                <div style={{ fontWeight: 600, minWidth: 80 }}>
+                        <div key={sub.id} className="responsive-card submission-card">
+                            <div className="submission-info">
+                                <div className="status-badge">
                                     {sub.graded ? 'Graded' : 'Ungraded'}
                                 </div>
-                                <div style={{ 
-                                    background: '#E8DEF8', 
-                                    width: 40, 
-                                    height: 40, 
-                                    borderRadius: '50%', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center',
-                                    color: '#6750A4',
-                                    fontWeight: 600
-                                }}>
+                                <div className="student-avatar">
                                     {String(index + 1).padStart(2, '0')}
                                 </div>
-                                <div style={{ fontWeight: 600, minWidth: 150 }}>
+                                <div className="student-name">
                                     {sub.studentName || sub.studentEmail || 'Unknown Student'}
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-                                <div style={{ color: '#333' }}>
+                            <div className="submission-actions-wrapper">
+                                <div className="submission-date">
                                     Submitted on: {formatDate(sub.submittedAt)}
                                 </div>
                                 
-                                <div style={{ display: 'flex', gap: 12 }}>
+                                <div className="action-buttons">
                                     <button 
                                         onClick={() => navigate(`/grade/${sub.id}`)}
-                                        style={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            gap: 8,
-                                            padding: '8px 16px', 
-                                            borderRadius: 20, 
-                                            border: '1px solid #6750A4', 
-                                            background: '#E8DEF8',
-                                            color: '#1D192B',
-                                            cursor: 'pointer',
-                                            fontWeight: 500
-                                        }}
+                                        className="btn-mark"
                                     >
                                         <CheckSquare size={16} />
                                         {sub.graded ? 'Edit Grades' : 'Mark Quiz'}
@@ -221,24 +186,10 @@ export default function QuizSubmissions() {
                                     
                                     <button 
                                         onClick={() => navigate(`/grade/feedback/${sub.id}`)}
-                                        style={{ 
-                                            padding: '8px 16px', 
-                                            borderRadius: 20, 
-                                            border: '1px solid #79747E', 
-                                            background: 'white',
-                                            color: '#1D192B',
-                                            cursor: 'pointer',
-                                            fontWeight: 500
-                                        }}
+                                        className="btn-feedback"
                                     >
                                         {sub.graded ? 'Edit Feedback' : 'Add Feedback'}
                                     </button>
-                                </div>
-
-                                <div style={{ display: 'flex', gap: 8 }}>
-                                    {/* Placeholder icons from screenshot */}
-                                    <div style={{ width: 32, height: 32, background: '#E8DEF8', borderRadius: 4 }}></div>
-                                    <div style={{ width: 32, height: 32, background: '#E8DEF8', borderRadius: 4 }}></div>
                                 </div>
                             </div>
                         </div>

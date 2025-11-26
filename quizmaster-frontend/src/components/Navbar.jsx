@@ -81,22 +81,24 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="mobile-menu">
           <Link to="/" className="mobile-nav-link" onClick={toggleMenu}>Home</Link>
-          {!user && (
+          {user && (
             <>
-              <Link to="/login" className="mobile-nav-link" onClick={toggleMenu}>Login</Link>
-              <Link to="/signup" className="mobile-nav-link" onClick={toggleMenu}>Signup</Link>
-            </>
-          )}
-          {user && role === "educator" && (
-            <>
-              <Link to="/create-quiz" className="mobile-nav-link" onClick={toggleMenu}>Create Quiz</Link>
-              <Link to="/question-bank" className="mobile-nav-link" onClick={toggleMenu}>Question Bank</Link>
               <Link to="/dashboard" className="mobile-nav-link" onClick={toggleMenu}>Dashboard</Link>
+              <Link to="/question-bank" className="mobile-nav-link" onClick={toggleMenu}>Question Bank</Link>
+              <Link to="/create-quiz" className="mobile-nav-link" onClick={toggleMenu}>Create Quiz</Link>
+              <Link to="/quiz-submissions" className="mobile-nav-link" onClick={toggleMenu}>Submissions</Link>
             </>
           )}
-          {user && role === "student" && (
-            <Link to="/take-quiz" className="mobile-nav-link" onClick={toggleMenu}>Take Quiz</Link>
-          )}
+          <div className="mobile-user-section">
+            <div className="mobile-user-info">
+              <span className="user-email">{user.email}</span>
+              <span className="user-role-badge">{role}</span>
+            </div>
+            <button onClick={doLogout} className="mobile-logout-button">
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       )}
     </nav>

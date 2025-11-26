@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../App.css';
 import './AutoGenerate.css';
 import { useNavigate } from 'react-router-dom';
+import { geminiService } from '../services/geminiService';
 
 const QUESTION_TYPES = {
     MCQ: {
@@ -31,28 +32,28 @@ export default function AutoGenerate() {
     const [timeLimit, setTimeLimit] = useState(7);
     const [generatedQuestions, setGeneratedQuestions] = useState([]);
     const [showGenerated, setShowGenerated] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const decreaseTime = () => setTimeLimit(t => Math.max(1, t - 1));
     const increaseTime = () => setTimeLimit(t => t + 1);
 
-    const generateQuestions = () => {
-        const questions = [];
-        for (let i = 0; i < count; i++) {
-            const question = {
-                id: Date.now() + i,
-                question: `Question ${i + 1}?`,
-                type: selectedType,
-                choices: selectedType === 'MCQ' || selectedType === 'CHECKBOX' 
-                    ? ['Choice 1', 'Choice 2', 'Choice 3'] 
-                    : selectedType === 'TRUE_FALSE'
-                    ? ['True', 'False']
-                    : [],
-                accepted: false
-            };
-            questions.push(question);
+    const generateQuestions = async () => {
+        if (!paragraph.trim()) {
+            alert("Please enter a paragraph to generate questions from.");
+            return;
         }
-        setGeneratedQuestions(questions);
-        setShowGenerated(true);
+
+        setLoading(true);
+        try {
+            const questions = await geminiService.generateQuestions(paragraph, count, selectedType);
+            setGeneratedQuestions(questions);
+            setShowGenerated(true);
+        } catch (error) {
+            console.error("Failed to generate questions:", error);
+            alert("Failed to generate questions. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleAccept = (id) => {
@@ -67,9 +68,13 @@ export default function AutoGenerate() {
 
     const handleAddToQuiz = () => {
         const acceptedQuestions = generatedQuestions.filter(q => q.accepted);
-        // TODO: Add accepted questions to quiz
-        console.log('Adding to quiz:', acceptedQuestions);
-        navigate('/create-quiz');
+        if (acceptedQuestions.length === 0) {
+            alert("Please accept at least one question to add to the quiz.");
+            return;
+        }
+        
+        // Navigate to CreateQuiz with the questions
+        navigate('/create-quiz', { state: { importedQuestions: acceptedQuestions } });
     };
 
     const handleCancel = () => {
@@ -99,8 +104,8 @@ export default function AutoGenerate() {
                                     <div className="slider-row">
                                         <input
                                             type="range"
-                                            min="0"
-                                            max="100"
+                                            min="1"
+                                            max="20"
                                             value={count}
                                             onChange={(e) => setCount(parseInt(e.target.value, 10) || 0)}
                                         />
@@ -134,8 +139,12 @@ export default function AutoGenerate() {
                         </div>
 
                         <div style={{ textAlign: 'center', marginTop: 24 }}>
-                            <button className="generate-placeholder" onClick={generateQuestions}>
-                                Generate Questions
+                            <button 
+                                className="generate-placeholder" 
+                                onClick={generateQuestions}
+                                disabled={loading}
+                            >
+                                {loading ? 'Generating...' : 'Generate Questions'}
                             </button>
                         </div>
                     </>

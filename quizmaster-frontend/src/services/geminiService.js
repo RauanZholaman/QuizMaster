@@ -83,7 +83,7 @@ export const geminiService = {
             prompt += `.`;
         }
 
-        prompt += `\n\nRespond ONLY with valid JSON in this exact format:
+        prompt += `\n\nRespond ONLY with valid JSON. Do not include any markdown formatting or explanation. The JSON should follow this exact format:
 {
   "questions": [
     {
@@ -106,23 +106,23 @@ Generate exactly ${questionCount} questions. Make sure your response is valid JS
         try {
             console.log('Parsing AI response:', responseText.substring(0, 200) + '...');
             
-            // Try to extract JSON from the response - look for the first complete JSON object
-            let jsonMatch = responseText.match(/\{[\s\S]*?\}/);
-            
-            // If that doesn't work, try to find JSON between ```json blocks
-            if (!jsonMatch) {
-                jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
-                if (jsonMatch) {
-                    jsonMatch[0] = jsonMatch[1];
-                }
-            }
-            
-            // If still no JSON, try the whole response
-            if (!jsonMatch) {
-                jsonMatch = [responseText.trim()];
+            let cleanText = responseText;
+
+            // 1. Try to extract from code blocks first
+            const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (codeBlockMatch) {
+                cleanText = codeBlockMatch[1];
             }
 
-            const parsedResponse = JSON.parse(jsonMatch[0]);
+            // 2. Find first '{' and last '}' to handle potential extra text
+            const firstBrace = cleanText.indexOf('{');
+            const lastBrace = cleanText.lastIndexOf('}');
+
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                cleanText = cleanText.substring(firstBrace, lastBrace + 1);
+            }
+
+            const parsedResponse = JSON.parse(cleanText);
             
             if (!parsedResponse.questions || !Array.isArray(parsedResponse.questions)) {
                 throw new Error('Invalid response format - no questions array found');

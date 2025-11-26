@@ -24,11 +24,11 @@ export const geminiService = {
             const prompt = this.buildSimplePrompt(paragraph, questionCount, questionType, category, subcategory);
             
             try {
-                console.log('🔄 Generating questions with Gemini 2.0 Flash...');
+                console.log('🔄 Generating questions with Gemini 1.5 Flash...');
                 
                 // Use the SDK if available
                 if (genAI) {
-                    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+                    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
                     const result = await model.generateContent(prompt);
                     const response = await result.response;
                     const text = response.text();
@@ -47,10 +47,8 @@ export const geminiService = {
                 throw new Error('No valid questions generated from API response');
                 
             } catch (apiError) {
-                console.log('⚠️ AI generation failed:', apiError.message);
-                // Fallback to sample questions if AI fails
-                console.log('📝 Using sample questions as fallback due to API error');
-                return this.generateFallbackQuestions(questionType, questionCount);
+                console.error('⚠️ AI generation failed:', apiError.message);
+                throw apiError; // Re-throw to let the UI handle the error
             }
             
         } catch (error) {

@@ -45,7 +45,10 @@ export default function Navbar() {
             </>
           )}
           {user && role === "student" && (
-            <Link to="/take-quiz" className="nav-link">Take Quiz</Link>
+            <>
+              <Link to="/take-quiz" className="nav-link">Take Quiz</Link>
+              <Link to="/my-results" className="nav-link">My Results</Link>
+            </>
           )}
         </div>
 
@@ -96,7 +99,10 @@ export default function Navbar() {
           </>
         )}
         {user && role === "student" && (
-          <Link to="/take-quiz" className="mobile-nav-link" onClick={toggleMenu}>Take Quiz</Link>
+          <>
+            <Link to="/take-quiz" className="mobile-nav-link" onClick={toggleMenu}>Take Quiz</Link>
+            <Link to="/my-results" className="mobile-nav-link" onClick={toggleMenu}>My Results</Link>
+          </>
         )}
         
         {user && (

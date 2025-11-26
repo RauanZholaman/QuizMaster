@@ -81,12 +81,15 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="mobile-menu">
           <Link to="/" className="mobile-nav-link" onClick={toggleMenu}>Home</Link>
-          {user && (
+          {user && role === "educator" && (
             <>
               <Link to="/dashboard" className="mobile-nav-link" onClick={toggleMenu}>Dashboard</Link>
               <Link to="/question-bank" className="mobile-nav-link" onClick={toggleMenu}>Question Bank</Link>
               <Link to="/create-quiz" className="mobile-nav-link" onClick={toggleMenu}>Create Quiz</Link>
             </>
+          )}
+          {user && role === "student" && (
+            <Link to="/take-quiz" className="mobile-nav-link" onClick={toggleMenu}>Take Quiz</Link>
           )}
           <div className="mobile-user-section">
             <div className="mobile-user-info">

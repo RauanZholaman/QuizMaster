@@ -741,6 +741,15 @@ export default function CreateQuiz() {
     };
 
     const generateQuestions = async () => {
+        if (!quizData.category) {
+            alert("Please select a category.");
+            return;
+        }
+        if (!quizData.subcategory) {
+            alert("Please select a subcategory.");
+            return;
+        }
+
         setAutoGenState(prev => ({ ...prev, isGenerating: true }));
         
         try {
@@ -981,9 +990,9 @@ export default function CreateQuiz() {
                             <button 
                                 className="generate-placeholder" 
                                 onClick={generateQuestions}
-                                disabled={autoGenState.isGenerating || !autoGenState.inputText.trim()}
+                                disabled={autoGenState.isGenerating || !autoGenState.inputText.trim() || !quizData.category || !quizData.subcategory}
                             >
-                                Generate Questions
+                                {autoGenState.isGenerating ? 'Generating...' : 'Generate Questions'}
                             </button>
                         </div>
                     </>

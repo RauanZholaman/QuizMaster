@@ -22,6 +22,8 @@ import QuizFeedback from "../src/pages/QuizFeedback";
 import QuizSubmissions from "../src/pages/QuizSubmissions";
 import StudentResults from "../src/pages/StudentResults";
 import StudentSubmissionDetail from "../src/pages/StudentSubmissionDetail";
+import TermsOfUse from "../src/pages/TermsOfUse";
+import PrivacyPolicy from "../src/pages/PrivacyPolicy";
 
 export default function App() {
   return (
@@ -41,6 +43,8 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/terms" element={<TermsOfUse />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
         <Route
           path="/create-quiz"

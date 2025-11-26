@@ -192,19 +192,20 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto;
+    line-height: 1;
 }
 
 /* Loading Spinner */
 .loading-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
+    animation: spin 1s linear infinite;
     margin-right: 10px;
-    vertical-align: middle;
+    box-sizing: border-box;
 }
 
 @keyframes spin {

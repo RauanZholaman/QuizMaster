@@ -179,6 +179,12 @@
     font-size: 16px;
     font-weight: 500;
     min-width: 180px;
+    
+    /* Flexbox for alignment */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .generate-placeholder:hover {
@@ -188,11 +194,7 @@
 .generate-placeholder:disabled {
     background: #9e8bc9;
     cursor: not-allowed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    line-height: 1;
+    /* Flex properties inherited from base class */
 }
 
 /* Loading Spinner */
@@ -204,8 +206,8 @@
     border-radius: 50%;
     border-top-color: #fff;
     animation: spin 1s linear infinite;
-    margin-right: 10px;
     box-sizing: border-box;
+    /* Removed margin-right as we use gap in parent */
 }
 
 @keyframes spin {

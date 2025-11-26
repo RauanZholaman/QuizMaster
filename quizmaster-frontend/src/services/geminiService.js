@@ -16,8 +16,8 @@ export const geminiService = {
         try {
             // Check if API key exists
             if (!API_KEY || API_KEY.trim() === '') {
-                console.log('No API key found, using fallback questions');
-                return this.generateFallbackQuestions(questionType, questionCount);
+                console.error('No API key found. Please check your .env file.');
+                throw new Error('Gemini API key is missing. Please configure it in your environment variables.');
             }
 
             console.log('🤖 Using Gemini AI to generate real questions...');
@@ -53,8 +53,7 @@ export const geminiService = {
             
         } catch (error) {
             console.error('Error generating questions:', error);
-            console.log('📝 Using sample questions as fallback');
-            return this.generateFallbackQuestions(questionType, questionCount);
+            throw error; // Propagate error to UI instead of falling back
         }
     },
 

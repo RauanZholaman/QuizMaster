@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { X } from "lucide-react";
 
 export default function QuestionViewer() {
   const { id: quizId } = useParams(); // e.g. "maths"
@@ -19,6 +20,7 @@ export default function QuestionViewer() {
   const [answers, setAnswers] = useState({});
   const [remaining, setRemaining] = useState(undefined);
   const startAt = useRef(null);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   // ----- timer -----
   useEffect(() => {
@@ -27,6 +29,31 @@ export default function QuestionViewer() {
     setRemaining(Number.isFinite(secs) && secs > 0 ? secs : undefined);
     startAt.current = Date.now();
   }, [quiz]);
+
+  // Prevent tab close / refresh
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+  // Prevent browser back button
+  useEffect(() => {
+    window.history.pushState(null, null, window.location.href);
+    const handlePopState = () => {
+      window.history.pushState(null, null, window.location.href);
+      setShowExitModal(true);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleConfirmExit = () => {
+    nav('/', { replace: true });
+  };
 
   useEffect(() => {
     if (typeof remaining !== "number") return;
@@ -190,27 +217,48 @@ export default function QuestionViewer() {
               marginBottom: "16px",
             }}
           >
-            <div>
-              <div
-                style={{
-                  fontSize: "24px",
-                  fontWeight: 700,
-                  marginBottom: "4px",
-                }}
-              >
-                {quiz.title || "Quiz"}
-              </div>
-              <div
-                style={{
-                  fontSize: "14px",
-                  color: "#6b7280",
-                  borderBottom: "3px solid #a855f7",
-                  paddingBottom: "6px",
-                  display: "inline-block",
-                  minWidth: "140px",
-                }}
-              >
-                Question {idx + 1} / {total}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+              <button 
+                 onClick={() => setShowExitModal(true)}
+                 style={{
+                   background: '#fee2e2',
+                   border: 'none',
+                   cursor: 'pointer',
+                   color: '#ef4444',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   width: '32px',
+                   height: '32px',
+                   borderRadius: '8px',
+                   marginTop: '4px'
+                 }}
+                 title="Quit Quiz"
+               >
+                 <X size={20} />
+               </button>
+              <div>
+                <div
+                  style={{
+                    fontSize: "24px",
+                    fontWeight: 700,
+                    marginBottom: "4px",
+                  }}
+                >
+                  {quiz.title || "Quiz"}
+                </div>
+                <div
+                  style={{
+                    fontSize: "14px",
+                    color: "#6b7280",
+                    borderBottom: "3px solid #a855f7",
+                    paddingBottom: "6px",
+                    display: "inline-block",
+                    minWidth: "140px",
+                  }}
+                >
+                  Question {idx + 1} / {total}
+                </div>
               </div>
             </div>
 
@@ -630,6 +678,66 @@ export default function QuestionViewer() {
               })}
             </div>
           </div>
+
+          {/* Exit Confirmation Modal */}
+          {showExitModal && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                background: 'white',
+                padding: '24px',
+                borderRadius: '12px',
+                maxWidth: '400px',
+                width: '90%',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+              }}>
+                <h3 style={{ marginTop: 0, color: '#1f2937', fontSize: '18px', fontWeight: 600 }}>Exit Quiz?</h3>
+                <p style={{ color: '#4b5563', marginBottom: '24px', lineHeight: 1.5 }}>
+                  Are you sure you want to leave? Your attempt will be voided and will not be saved.
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                  <button
+                    onClick={() => setShowExitModal(false)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      border: '1px solid #d1d5db',
+                      background: 'white',
+                      color: '#374151',
+                      cursor: 'pointer',
+                      fontWeight: 500
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmExit}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      background: '#ef4444',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontWeight: 500
+                    }}
+                  >
+                    Exit Quiz
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

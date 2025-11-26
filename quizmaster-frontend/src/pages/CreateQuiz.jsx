@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../App.css';
 import './CreateQuiz.css';
 import './AutoGenerate.css';
@@ -68,6 +68,7 @@ const SUBCATEGORIES = {
 
 export default function CreateQuiz() {
     const { user } = useAuth();
+    const location = useLocation();
     // const navigate = useNavigate(); // Not currently used
     const [creationType, setCreationType] = useState(null);
     const [isPublishing, setIsPublishing] = useState(false);
@@ -746,7 +747,9 @@ export default function CreateQuiz() {
             const questions = await geminiService.generateQuestions(
                 autoGenState.inputText,
                 autoGenState.questionCount,
-                autoGenState.questionType
+                autoGenState.questionType,
+                quizData.subject,
+                quizData.subcategory
             );
             
             setAutoGenState(prev => ({
@@ -757,7 +760,7 @@ export default function CreateQuiz() {
             }));
         } catch (error) {
             console.error('Error generating questions:', error);
-            alert('Failed to generate questions. Please check your API key and try again.');
+            alert(`Failed to generate questions: ${error.message}`);
             setAutoGenState(prev => ({ ...prev, isGenerating: false }));
         }
     };
@@ -780,15 +783,55 @@ export default function CreateQuiz() {
 
     const handleAddGeneratedToQuiz = () => {
         const acceptedQuestions = autoGenState.generatedQuestions.filter(q => q.accepted);
-        console.log('Adding to quiz:', acceptedQuestions);
+        
+        if (acceptedQuestions.length === 0) {
+            alert("Please accept at least one question.");
+            return;
+        }
+
+        // Transform generated questions to match quizData structure
+        const newQuestions = acceptedQuestions.map(q => {
+            let correctAnswers = [];
+            
+            // Map correct answer string to index for choice-based questions
+            if (q.choices && q.choices.length > 0 && q.correctAnswer) {
+                const index = q.choices.findIndex(c => c === q.correctAnswer);
+                if (index !== -1) {
+                    correctAnswers = [index];
+                } else {
+                    // Fallback if exact match not found (shouldn't happen with good AI)
+                    console.warn(`Could not find correct answer "${q.correctAnswer}" in choices`, q.choices);
+                }
+            } else if (q.correctAnswer) {
+                // For text based questions
+                correctAnswers = [q.correctAnswer];
+            }
+
+            return {
+                id: q.id, // Keep the ID from generation
+                type: q.type,
+                question: q.question,
+                choices: q.choices || [],
+                correctAnswers: correctAnswers,
+                addToBank: false
+            };
+        });
+
+        setQuizData(prev => ({
+            ...prev,
+            title: autoGenState.quizTitle || prev.title,
+            questions: [...prev.questions, ...newQuestions]
+        }));
+
         // Reset auto gen state
         setAutoGenState(prev => ({
             ...prev,
             generatedQuestions: [],
             showGenerated: false
         }));
-        // Go back to quiz creation options or manual mode
-        setCreationType(null);
+        
+        // Switch to manual mode to review/publish
+        setCreationType('manual');
     };
 
     const handleCancelGenerated = () => {
@@ -801,6 +844,16 @@ export default function CreateQuiz() {
 
     const renderAutoGeneration = () => (
         <div className="auto-generate-container">
+            {autoGenState.isGenerating && (
+                <div className="loading-overlay">
+                    <div className="loading-content">
+                        <div className="loading-bar-container">
+                            <div className="loading-bar-progress"></div>
+                        </div>
+                        <h2>Generating Questions...</h2>
+                    </div>
+                </div>
+            )}
             <div className="auto-generate-card">
                 <div className="header">
                     <button className="back-button" onClick={handleBack}>←</button>
@@ -930,7 +983,7 @@ export default function CreateQuiz() {
                                 onClick={generateQuestions}
                                 disabled={autoGenState.isGenerating || !autoGenState.inputText.trim()}
                             >
-                                {autoGenState.isGenerating ? 'Generating Questions...' : 'Generate Questions'}
+                                Generate Questions
                             </button>
                         </div>
                     </>
@@ -980,6 +1033,48 @@ export default function CreateQuiz() {
             </div>
         </div>
     );
+
+    useEffect(() => {
+        if (location.state?.importedQuestions) {
+            const importedQuestions = location.state.importedQuestions;
+            
+            // Transform imported questions to match quizData structure
+            const newQuestions = importedQuestions.map(q => {
+                let correctAnswers = [];
+                
+                // Map correct answer string to index for choice-based questions
+                if (q.choices && q.choices.length > 0 && q.correctAnswer) {
+                    const index = q.choices.findIndex(c => c === q.correctAnswer);
+                    if (index !== -1) {
+                        correctAnswers = [index];
+                    }
+                } else if (q.correctAnswer) {
+                    // For text based questions
+                    correctAnswers = [q.correctAnswer];
+                }
+
+                return {
+                    id: q.id,
+                    type: q.type,
+                    question: q.question,
+                    choices: q.choices || [],
+                    correctAnswers: correctAnswers,
+                    addToBank: false
+                };
+            });
+
+            setQuizData(prev => ({
+                ...prev,
+                questions: [...prev.questions, ...newQuestions]
+            }));
+            
+            // Set to manual creation mode to show the questions
+            setCreationType('manual');
+            
+            // Clear state to prevent re-adding on refresh (optional, but good practice)
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     return (
         <div className="create-quiz-container">

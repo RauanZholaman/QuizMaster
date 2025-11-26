@@ -85,8 +85,8 @@ export default function Dashboard() {
         });
 
     return (
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px" }}>
-            <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
+        <div className="responsive-container">
+            <div className="responsive-header">
                 <div>
                     <h1 style={{ fontSize: 32, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>
                         Educator Dashboard
@@ -96,7 +96,7 @@ export default function Dashboard() {
                     </p>
                 </div>
                 
-                <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: '#374151' }}>
                         <input 
                             type="checkbox" 
@@ -163,23 +163,14 @@ export default function Dashboard() {
                     {sortedQuizzes.map((quiz) => (
                         <div 
                             key={quiz.id}
-                            style={{
-                                background: "white",
-                                border: "1px solid #e5e7eb",
-                                borderRadius: 12,
-                                padding: 24,
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
-                            }}
+                            className="responsive-card"
                         >
                             <div>
                                 <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
                                     <BookOpen size={20} color="#7c3aed" />
                                     {quiz.title}
                                 </h3>
-                                <div style={{ display: "flex", gap: 16, color: "#666", fontSize: 14 }}>
+                                <div className="responsive-meta-row">
                                     <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
                                         <Calendar size={16} />
                                         {formatDate(quiz.createdAt)}

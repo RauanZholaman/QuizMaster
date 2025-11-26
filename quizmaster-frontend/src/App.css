@@ -84,16 +84,6 @@
   text-align: justify;
 }
 
-.MyNavbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
-    0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  gap: 100;
-  padding: 20;
-}
-
 .Question-Bank-Content {
   padding-left: 5%;
   padding-right: 5%;
@@ -948,4 +938,322 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* --- Mobile Optimization --- */
+
+/* Container adjustments */
+.responsive-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* Header adjustments */
+.responsive-header {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* Card adjustments */
+.responsive-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Meta info row (date, subject, etc) */
+.responsive-meta-row {
+  display: flex;
+  gap: 16px;
+  color: #666;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+/* Mobile Media Query */
+@media (max-width: 768px) {
+  .responsive-container {
+    padding: 20px 16px;
+  }
+
+  .responsive-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .responsive-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .responsive-card > button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .responsive-meta-row {
+    gap: 10px;
+    margin-top: 8px;
+  }
+  
+  /* Adjust font sizes */
+  h1 {
+    font-size: 24px !important;
+  }
+  
+  h3 {
+    font-size: 16px !important;
+  }
+}
+
+/* Question Bank Mobile Optimization */
+@media (max-width: 768px) {
+  .Question-Bank-Header {
+    display: none; /* Hide table header on mobile */
+  }
+
+  .Question-Bank-Row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .Question-Bank-Row > div {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Add labels for mobile view */
+  .Question-Bank-Row > div:nth-child(2)::before {
+    content: "Type:";
+    font-weight: 600;
+    color: #6b7280;
+    margin-right: 8px;
+  }
+
+  .Question-Bank-Row > div:nth-child(3)::before {
+    content: "Difficulty:";
+    font-weight: 600;
+    color: #6b7280;
+    margin-right: 8px;
+  }
+
+  /* Question text styling */
+  .Question-Bank-Row > div:first-child {
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: #1f2937;
+    font-weight: 700;
+  }
+
+  /* Actions container */
+  .Question-Bank-Row .action-icons {
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  /* Filter Bar adjustments */
+  .Question-Bank-Filter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .filter-left {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .question-bank-search input {
+    width: 100%;
+  }
+
+  /* Selection Grid adjustments */
+  .Selection-Question {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .box-select {
+    width: auto;
+    min-height: 70px;
+  }
+}
+
+/* Quiz Submissions Page Styles */
+.submission-filters {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  max-width: 800px;
+  margin: 0 auto 32px;
+}
+
+.search-box {
+  background: #F3E8F5;
+  padding: 12px 24px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+}
+
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.submission-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+.submission-info {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex: 1;
+}
+
+.status-badge {
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.student-avatar {
+  background: #E8DEF8;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6750A4;
+  font-weight: 600;
+}
+
+.student-name {
+  font-weight: 600;
+  min-width: 150px;
+}
+
+.submission-actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.submission-date {
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-mark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #6750A4;
+  background: #E8DEF8;
+  color: #1D192B;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-feedback {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #79747E;
+  background: white;
+  color: #1D192B;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Mobile Optimization for Quiz Submissions */
+@media (max-width: 768px) {
+  .submission-filters {
+    flex-direction: column;
+  }
+
+  .submission-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .submission-info {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 12px;
+  }
+
+  .submission-actions-wrapper {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .action-buttons {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .btn-mark, .btn-feedback {
+    justify-content: center;
+    width: 100%;
+  }
 }

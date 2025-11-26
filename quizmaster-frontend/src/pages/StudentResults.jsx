@@ -74,7 +74,7 @@ export default function StudentResults() {
     if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Loading results...</div>;
 
     return (
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "24px", fontFamily: 'Inter, sans-serif' }}>
+        <div className="responsive-container">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
                 <button 
                     onClick={() => navigate('/')}
@@ -108,16 +108,7 @@ export default function StudentResults() {
                     {submissions.map((sub, index) => (
                         <div 
                             key={sub.id}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                padding: '20px 24px',
-                                background: 'white',
-                                borderRadius: 12,
-                                border: '1px solid #e5e7eb',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-                            }}
+                            className="responsive-card"
                         >
                             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                                 <div style={{ 
@@ -130,7 +121,8 @@ export default function StudentResults() {
                                     justifyContent: 'center',
                                     color: '#6750A4',
                                     fontWeight: 600,
-                                    fontSize: 18
+                                    fontSize: 18,
+                                    flexShrink: 0
                                 }}>
                                     {String(index + 1).padStart(2, '0')}
                                 </div>
@@ -138,7 +130,7 @@ export default function StudentResults() {
                                     <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 600 }}>
                                         {sub.quizTitle}
                                     </h3>
-                                    <div style={{ display: 'flex', gap: 16, color: '#666', fontSize: 14 }}>
+                                    <div className="responsive-meta-row">
                                         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                             <Calendar size={14} />
                                             {formatDate(sub.submittedAt)}
@@ -179,7 +171,8 @@ export default function StudentResults() {
                                     fontStyle: 'italic',
                                     background: '#f5f5f5',
                                     borderRadius: 20,
-                                    border: '1px solid #e5e7eb'
+                                    border: '1px solid #e5e7eb',
+                                    textAlign: 'center'
                                 }}>
                                     Grading in Progress
                                 </div>

@@ -1,6 +1,6 @@
 // import "src/App.js";
 import "./App.css";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "../src/components/Navbar";
 import Footer from "../src/components/Footer";
 import ProtectedRoute from "../src/components/ProtectedRoute";
@@ -22,11 +22,18 @@ import QuizFeedback from "../src/pages/QuizFeedback";
 import QuizSubmissions from "../src/pages/QuizSubmissions";
 import StudentResults from "../src/pages/StudentResults";
 import StudentSubmissionDetail from "../src/pages/StudentSubmissionDetail";
+import TermsOfUse from "../src/pages/TermsOfUse";
+import PrivacyPolicy from "../src/pages/PrivacyPolicy";
 
 export default function App() {
+  const location = useLocation();
+  // Hide navbar/footer only on the actual quiz taking page
+  // Pattern: /quiz/someId (but not /quiz/someId/intro or /quiz/someId/submissions)
+  const isTakingQuiz = /^\/quiz\/[^/]+$/.test(location.pathname);
+
   return (
-    <div class="app-layout">
-      <Navbar />
+    <div className="app-layout">
+      {!isTakingQuiz && <Navbar />}
         
       <div className="main-content">
         <Routes>
@@ -41,6 +48,8 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/terms" element={<TermsOfUse />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
         <Route
           path="/create-quiz"
@@ -131,7 +140,7 @@ export default function App() {
       </Routes>
 
       </div>
-        <Footer/>
+        {!isTakingQuiz && <Footer/>}
     </div>
   );
 }

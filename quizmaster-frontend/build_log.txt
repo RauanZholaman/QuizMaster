@@ -1,0 +1,49 @@
+
+> quizmaster-frontend@0.1.0 build
+> react-scripts build
+
+Creating an optimized production build...
+Compiled with warnings.
+
+[eslint] 
+src\pages\CreateQuiz.jsx
+  Line 2:10:  'useNavigate' is defined but never used  no-unused-vars
+
+src\pages\Dashboard.jsx
+  Line 4:31:  'query' is defined but never used    no-unused-vars
+  Line 4:38:  'orderBy' is defined but never used  no-unused-vars
+
+src\pages\QuestionViewer.jsx
+  Line 39:6:  React Hook useEffect has a missing dependency: 'doSubmit'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\QuizIntro.jsx
+  Line 22:10:  'err' is assigned a value but never used  no-unused-vars
+
+src\pages\QuizSelection.jsx
+  Line 98:6:  React Hook useEffect has a missing dependency: 'CATEGORY_DEFINITIONS'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\QuizSubmissions.jsx
+  Line 5:42:  'MessageSquare' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+File sizes after gzip:
+
+  212.08 kB  build\static\js\main.8c295637.js
+  7.91 kB    build\static\css\main.dde8f157.css
+  1.77 kB    build\static\js\453.8fa06dc2.chunk.js
+
+The project was built assuming it is hosted at /.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+  npm install -g serve
+  serve -s build
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+

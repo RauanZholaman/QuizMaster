@@ -86,7 +86,6 @@ export default function Navbar() {
               <Link to="/dashboard" className="mobile-nav-link" onClick={toggleMenu}>Dashboard</Link>
               <Link to="/question-bank" className="mobile-nav-link" onClick={toggleMenu}>Question Bank</Link>
               <Link to="/create-quiz" className="mobile-nav-link" onClick={toggleMenu}>Create Quiz</Link>
-              <Link to="/quiz-submissions" className="mobile-nav-link" onClick={toggleMenu}>Submissions</Link>
             </>
           )}
           <div className="mobile-user-section">

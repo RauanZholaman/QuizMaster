@@ -1142,7 +1142,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 24px;
+  padding: 12px 24px;
   border-radius: 30px;
   border: 1px solid #e5e7eb;
   background: white;

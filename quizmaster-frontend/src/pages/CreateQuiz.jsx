@@ -844,6 +844,14 @@ export default function CreateQuiz() {
 
     const renderAutoGeneration = () => (
         <div className="auto-generate-container">
+            {autoGenState.isGenerating && (
+                <div className="loading-overlay">
+                    <div className="loading-content">
+                        <div className="spinner"></div>
+                        <h2>Generating Questions...</h2>
+                    </div>
+                </div>
+            )}
             <div className="auto-generate-card">
                 <div className="header">
                     <button className="back-button" onClick={handleBack}>←</button>
@@ -973,12 +981,7 @@ export default function CreateQuiz() {
                                 onClick={generateQuestions}
                                 disabled={autoGenState.isGenerating || !autoGenState.inputText.trim()}
                             >
-                                {autoGenState.isGenerating ? (
-                                    <>
-                                        <span className="loading-spinner"></span>
-                                        Generating Questions...
-                                    </>
-                                ) : 'Generate Questions'}
+                                Generate Questions
                             </button>
                         </div>
                     </>

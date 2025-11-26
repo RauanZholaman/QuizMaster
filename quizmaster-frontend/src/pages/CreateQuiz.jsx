@@ -747,7 +747,9 @@ export default function CreateQuiz() {
             const questions = await geminiService.generateQuestions(
                 autoGenState.inputText,
                 autoGenState.questionCount,
-                autoGenState.questionType
+                autoGenState.questionType,
+                quizData.subject,
+                quizData.subcategory
             );
             
             setAutoGenState(prev => ({

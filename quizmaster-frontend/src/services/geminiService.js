@@ -12,7 +12,7 @@ if (!API_KEY) {
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 export const geminiService = {
-    async generateQuestions(paragraph, questionCount, questionType) {
+    async generateQuestions(paragraph, questionCount, questionType, category, subcategory) {
         try {
             // Check if API key exists
             if (!API_KEY || API_KEY.trim() === '') {
@@ -21,7 +21,7 @@ export const geminiService = {
             }
 
             console.log('🤖 Using Gemini AI to generate real questions...');
-            const prompt = this.buildSimplePrompt(paragraph, questionCount, questionType);
+            const prompt = this.buildSimplePrompt(paragraph, questionCount, questionType, category, subcategory);
             
             try {
                 console.log('🔄 Generating questions with Gemini 2.0 Flash...');
@@ -60,7 +60,7 @@ export const geminiService = {
         }
     },
 
-    buildSimplePrompt(paragraph, questionCount, questionType) {
+    buildSimplePrompt(paragraph, questionCount, questionType, category, subcategory) {
         const typeInstructions = {
             'MCQ': 'multiple choice questions with 4 options each',
             'CHECKBOX': 'multiple choice questions with 4 options each (multiple answers possible)',
@@ -69,11 +69,24 @@ export const geminiService = {
             'SHORT_ANSWER': 'short answer questions'
         };
 
-        return `Create ${questionCount} ${typeInstructions[questionType] || 'questions'} based on this text:
+        let prompt = `Create ${questionCount} ${typeInstructions[questionType] || 'questions'}`;
+        
+        if (category) {
+            prompt += ` related to the subject "${category}"`;
+            if (subcategory) {
+                prompt += ` and specifically the topic "${subcategory}"`;
+            }
+        }
 
-"${paragraph}"
+        // Only include paragraph if it's provided and not the default sample text
+        const isDefaultText = paragraph && paragraph.includes("This is the sample paragraph");
+        if (paragraph && paragraph.trim() !== "" && !isDefaultText) {
+            prompt += ` based on the following text:\n\n"${paragraph}"`;
+        } else {
+            prompt += `.`;
+        }
 
-Respond ONLY with valid JSON in this exact format:
+        prompt += `\n\nRespond ONLY with valid JSON in this exact format:
 {
   "questions": [
     {
@@ -88,6 +101,8 @@ ${questionType === 'TRUE_FALSE' ? 'For true/false questions, use only ["True", "
 ${questionType === 'FILL_BLANK' || questionType === 'SHORT_ANSWER' ? 'For fill-in-blank and short answer questions, use empty array [] for choices and put the correct answer in correctAnswer.' : ''}
 
 Generate exactly ${questionCount} questions. Make sure your response is valid JSON that can be parsed.`;
+        
+        return prompt;
     },
 
     parseQuestions(responseText, questionType) {

@@ -26,6 +26,15 @@ export default function QuizSelection() {
     "general": { title: "General", color: "#E6E8EB" }
   };
 
+  const stringToColor = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const h = Math.abs(hash) % 360;
+    return `hsl(${h}, 70%, 85%)`;
+  };
+
   // Fetch ALL published quizzes and organize by category → subcategory → quizzes
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -50,11 +59,12 @@ export default function QuizSelection() {
           let categoryId = quiz.category;
           let subcategory = quiz.subcategory;
           
-          // If no category/subcategory (old quizzes), put in General
-          if (!categoryId || !CATEGORY_DEFINITIONS[categoryId]) {
+          // If no category, put in General
+          if (!categoryId) {
             categoryId = 'general';
             subcategory = 'General';
           }
+          
           if (!subcategory) {
             subcategory = 'General';
           }
@@ -66,8 +76,8 @@ export default function QuizSelection() {
             const categoryDef = CATEGORY_DEFINITIONS[categoryId];
             categoryMap[categoryId] = {
               id: categoryId,
-              title: categoryDef.title,
-              color: categoryDef.color,
+              title: categoryDef ? categoryDef.title : (quiz.subject || categoryId),
+              color: categoryDef ? categoryDef.color : stringToColor(categoryId),
               subcategories: {}
             };
           }

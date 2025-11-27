@@ -50,7 +50,8 @@ const CATEGORIES = [
     { id: "dbms", title: "Database Management" },
     { id: "networking", title: "Networking" },
     { id: "python", title: "Python" },
-    { id: "java", title: "Java" }
+    { id: "java", title: "Java" },
+    { id: "custom", title: "Create New Category..." }
 ];
 
 // Subcategories/Topics per category
@@ -258,11 +259,12 @@ export default function CreateQuiz() {
                     <select 
                         value={quizData.category}
                         onChange={(e) => {
-                            const selectedCategory = CATEGORIES.find(c => c.id === e.target.value);
+                            const val = e.target.value;
+                            const selectedCategory = CATEGORIES.find(c => c.id === val);
                             setQuizData(prev => ({
                                 ...prev,
-                                category: e.target.value,
-                                subject: selectedCategory ? selectedCategory.title : '',
+                                category: val,
+                                subject: selectedCategory && val !== 'custom' ? selectedCategory.title : '',
                                 subcategory: '' // Reset subcategory when category changes
                             }));
                         }}
@@ -280,26 +282,51 @@ export default function CreateQuiz() {
                         ))}
                     </select>
                 </div>
-                {quizData.category && SUBCATEGORIES[quizData.category] && (
+                
+                {quizData.category === 'custom' && (
                     <div className="form-group">
-                        <label>Topic/Subcategory</label>
-                        <select 
+                        <label>Custom Category Name</label>
+                        <input 
+                            type="text" 
+                            placeholder="Enter category name" 
+                            value={quizData.subject}
+                            onChange={(e) => handleInputChange('subject', e.target.value)}
+                        />
+                    </div>
+                )}
+
+                {quizData.category === 'custom' ? (
+                    <div className="form-group">
+                        <label>Custom Topic/Subcategory</label>
+                        <input 
+                            type="text" 
+                            placeholder="Enter topic name" 
                             value={quizData.subcategory}
                             onChange={(e) => handleInputChange('subcategory', e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ccc',
-                                fontSize: '14px'
-                            }}
-                        >
-                            <option value="">Select a topic *</option>
-                            {SUBCATEGORIES[quizData.category].map(topic => (
-                                <option key={topic} value={topic}>{topic}</option>
-                            ))}
-                        </select>
+                        />
                     </div>
+                ) : (
+                    quizData.category && SUBCATEGORIES[quizData.category] && (
+                        <div className="form-group">
+                            <label>Topic/Subcategory</label>
+                            <select 
+                                value={quizData.subcategory}
+                                onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    borderRadius: '5px',
+                                    border: '1px solid #ccc',
+                                    fontSize: '14px'
+                                }}
+                            >
+                                <option value="">Select a topic *</option>
+                                {SUBCATEGORIES[quizData.category].map(topic => (
+                                    <option key={topic} value={topic}>{topic}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )
                 )}
                 <div className="form-group">
                     <label>Quiz Type</label>
@@ -563,6 +590,13 @@ export default function CreateQuiz() {
         }
 
         try {
+            // Handle custom category ID generation
+            let finalCategory = quizData.category;
+            if (finalCategory === 'custom') {
+                finalCategory = quizData.subject.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+                if (!finalCategory) finalCategory = 'custom-' + Date.now();
+            }
+
             // Save each question individually to questionBank collection
             const questionBankCol = collection(db, 'questionBank');
             const promises = [];
@@ -570,7 +604,7 @@ export default function CreateQuiz() {
             quizData.questions.forEach((q) => {
                 const questionDoc = {
                     ...normalizeQuestionForStorage(q),
-                    category: quizData.category,
+                    category: finalCategory,
                     subject: quizData.subject,
                     subcategory: quizData.subcategory,
                     quizTitle: quizData.title || 'Untitled Quiz',
@@ -631,10 +665,17 @@ export default function CreateQuiz() {
             return;
         }
 
+        // Handle custom category ID generation
+        let finalCategory = quizData.category;
+        if (finalCategory === 'custom') {
+            finalCategory = quizData.subject.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+            if (!finalCategory) finalCategory = 'custom-' + Date.now();
+        }
+
         const payload = {
             title: quizData.title,
             description: quizData.description,
-            category: quizData.category,     // For quiz taking feature
+            category: finalCategory,     // For quiz taking feature
             subject: quizData.subject,       // Human-readable name
             subcategory: quizData.subcategory || '', // Topic/subtopic
             quizType: quizData.quizType,
@@ -664,7 +705,7 @@ export default function CreateQuiz() {
                 if (q.addToBank) {
                     const qb = normalizeQuestionForStorage(q);
                     // include reference to published quiz id for traceability
-                    qb.category = quizData.category;     
+                    qb.category = payload.category;     
                     qb.subject = quizData.subject;          
                     qb.subcategory = quizData.subcategory;
                     qb.quizId = quizRef.id;
@@ -886,11 +927,12 @@ export default function CreateQuiz() {
                             <select 
                                 value={quizData.category}
                                 onChange={(e) => {
-                                    const selectedCategory = CATEGORIES.find(c => c.id === e.target.value);
+                                    const val = e.target.value;
+                                    const selectedCategory = CATEGORIES.find(c => c.id === val);
                                     setQuizData(prev => ({
                                         ...prev,
-                                        category: e.target.value,
-                                        subject: selectedCategory ? selectedCategory.title : '',
+                                        category: val,
+                                        subject: selectedCategory && val !== 'custom' ? selectedCategory.title : '',
                                         subcategory: '' // Reset subcategory when category changes
                                     }));
                                 }}
@@ -909,26 +951,50 @@ export default function CreateQuiz() {
                             </select>
                         </div>
 
-                        {quizData.category && SUBCATEGORIES[quizData.category] && (
+                        {quizData.category === 'custom' && (
                             <div className="form-group">
-                                <label>Topic/Subcategory *</label>
-                                <select 
+                                <label>Custom Category Name</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter category name" 
+                                    value={quizData.subject}
+                                    onChange={(e) => handleInputChange('subject', e.target.value)}
+                                />
+                            </div>
+                        )}
+
+                        {quizData.category === 'custom' ? (
+                            <div className="form-group">
+                                <label>Custom Topic/Subcategory *</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter topic name" 
                                     value={quizData.subcategory}
                                     onChange={(e) => handleInputChange('subcategory', e.target.value)}
-                                    style={{
-                                        width: '100%',
-                                        padding: '10px',
-                                        borderRadius: '5px',
-                                        border: '1px solid #ccc',
-                                        fontSize: '14px'
-                                    }}
-                                >
-                                    <option value="">Select a topic *</option>
-                                    {SUBCATEGORIES[quizData.category].map(topic => (
-                                        <option key={topic} value={topic}>{topic}</option>
-                                    ))}
-                                </select>
+                                />
                             </div>
+                        ) : (
+                            quizData.category && SUBCATEGORIES[quizData.category] && (
+                                <div className="form-group">
+                                    <label>Topic/Subcategory *</label>
+                                    <select 
+                                        value={quizData.subcategory}
+                                        onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px',
+                                            borderRadius: '5px',
+                                            border: '1px solid #ccc',
+                                            fontSize: '14px'
+                                        }}
+                                    >
+                                        <option value="">Select a topic *</option>
+                                        {SUBCATEGORIES[quizData.category].map(topic => (
+                                            <option key={topic} value={topic}>{topic}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )
                         )}
 
                         <div className="input-paragraph">

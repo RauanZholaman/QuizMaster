@@ -85,12 +85,13 @@ export default function QuizIntro() {
           background: "#f2d7f3",
           borderRadius: "8px",
           padding: "16px",
-          fontSize: "20px",
-          fontWeight: "600",
           marginBottom: "24px",
         }}
       >
-        Instructions
+        <div style={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>Instructions</div>
+        <div style={{ fontSize: "16px", fontWeight: "400" }}>
+            {quiz.description || "No specific instructions for this quiz. Good luck!"}
+        </div>
       </div>
 
       {/* info box */}
@@ -107,7 +108,7 @@ export default function QuizIntro() {
       >
         <div>
           Questions :{" "}
-          <span style={{ fontWeight: "700" }}>{questionCount} qus</span>
+          <span style={{ fontWeight: "700" }}>{questionCount} qns</span>
         </div>
         <div>
           Time limit :{" "}

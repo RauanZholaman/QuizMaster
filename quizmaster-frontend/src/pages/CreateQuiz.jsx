@@ -1024,20 +1024,6 @@ export default function CreateQuiz() {
                                         ))}
                                     </select>
                                 </div>
-
-                                <div className="control-row time-control">
-                                    <label>Time Limit</label>
-                                    <div className="time-input">
-                                        <button onClick={() => handleAutoGenTimeLimit(-1)}>−</button>
-                                        <input 
-                                            type="number" 
-                                            value={autoGenState.timeLimit} 
-                                            readOnly 
-                                        />
-                                        <button onClick={() => handleAutoGenTimeLimit(1)}>+</button>
-                                        <span> mins</span>
-                                    </div>
-                                </div>
                             </div>
 
                             {/* Removed checkbox group for question types. Only dropdown remains. */}

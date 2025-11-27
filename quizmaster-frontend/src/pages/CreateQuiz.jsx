@@ -795,7 +795,7 @@ export default function CreateQuiz() {
         
         try {
             const questions = await geminiService.generateQuestions(
-                autoGenState.inputText,
+                "", // No paragraph input
                 autoGenState.questionCount,
                 autoGenState.questionType,
                 quizData.subject,
@@ -953,7 +953,7 @@ export default function CreateQuiz() {
 
                         {quizData.category === 'custom' && (
                             <div className="form-group">
-                                <label>Custom Category Name</label>
+                                <label>Custom Category Name *</label>
                                 <input 
                                     type="text" 
                                     placeholder="Enter category name" 
@@ -996,15 +996,6 @@ export default function CreateQuiz() {
                                 </div>
                             )
                         )}
-
-                        <div className="input-paragraph">
-                            <label>Input Paragraph</label>
-                            <textarea 
-                                placeholder="Enter your paragraph here..." 
-                                value={autoGenState.inputText}
-                                onChange={(e) => handleAutoGenInputChange('inputText', e.target.value)}
-                            />
-                        </div>
 
                         <div className="auto-controls">
                             <div className="control-left">
@@ -1056,7 +1047,7 @@ export default function CreateQuiz() {
                             <button 
                                 className="generate-placeholder" 
                                 onClick={generateQuestions}
-                                disabled={autoGenState.isGenerating || !autoGenState.inputText.trim() || !quizData.category || !quizData.subcategory}
+                                disabled={autoGenState.isGenerating || !quizData.category || !quizData.subcategory}
                             >
                                 {autoGenState.isGenerating ? 'Generating...' : 'Generate Questions'}
                             </button>
